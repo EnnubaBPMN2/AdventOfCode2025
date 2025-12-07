@@ -1,0 +1,33 @@
+# Advent of Code 2025 - Python Solutions
+
+from day01.solution import run as run_day01
+
+def main():
+    print("\n" + "="*50)
+    print("🎄 Advent of Code 2025 - Python Solutions 🎄")
+    print("="*50 + "\n")
+    
+    while True:
+        try:
+            day = input("Select a day (1-25) or 0 to exit: ").strip()
+            day_num = int(day)
+            
+            if day_num == 0:
+                print("\n🎄 Happy Coding! 🎄\n")
+                break
+            
+            if day_num == 1:
+                run_day01()
+            # Add more days here as you implement them
+            # elif day_num == 2:
+            #     run_day02()
+            else:
+                print(f"\n⚠ Day {day_num} not implemented yet!\n")
+                
+        except ValueError:
+            print("Invalid input. Please enter a number.\n")
+        except Exception as e:
+            print(f"\n✗ Error: {e}\n")
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,30 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+*.sln.docstates
+
+# C#
+bin/
+obj/
+*.csproj.user
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.venv/
+venv/
+*.spec
+
+# Rust
+target/
+**/*.rs.bk
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Advent of Code Inputs (Optional: usually good to ignore real inputs if you want to keep them private, but user has them in repo structure)
+# inputs/
