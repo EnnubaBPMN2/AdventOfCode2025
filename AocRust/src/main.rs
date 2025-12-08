@@ -2,6 +2,7 @@ use std::io::{self, Write};
 
 mod utils;
 mod day01;
+mod day02;
 
 fn main() {
     println!("\n{}", "=".repeat(50));
@@ -24,9 +25,9 @@ fn main() {
                 day01::run();
             }
             // Add more days here as you implement them
-            // Ok(2) => {
-            //     day02::run();
-            // }
+            Ok(2) => {
+                day02::run();
+            }
             Ok(day) => {
                 println!("\n⚠ Day {} not implemented yet!\n", day);
             }

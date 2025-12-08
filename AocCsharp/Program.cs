@@ -1,4 +1,5 @@
 ﻿using AocCsharp.Day01;
+using AocCsharp.Day02;
 
 Console.Clear();
 Console.ForegroundColor = ConsoleColor.Green;
@@ -41,9 +42,9 @@ while (true)
                 Day01.Run();
                 break;
             // Add more days here as you implement them
-            // case 2:
-            //     Day02.Run();
-            //     break;
+            case 2:
+                Day02.Run();
+                break;
             default:
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine($"\n⚠ Day {day} not implemented yet!");

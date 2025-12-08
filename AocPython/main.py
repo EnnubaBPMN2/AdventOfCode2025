@@ -1,6 +1,7 @@
 # Advent of Code 2025 - Python Solutions
 
 from day01.solution import run as run_day01
+from day02.solution import run as run_day02
 
 def main():
     print("\n" + "="*50)
@@ -19,8 +20,8 @@ def main():
             if day_num == 1:
                 run_day01()
             # Add more days here as you implement them
-            # elif day_num == 2:
-            #     run_day02()
+            elif day_num == 2:
+                run_day02()
             else:
                 print(f"\n⚠ Day {day_num} not implemented yet!\n")
                 
