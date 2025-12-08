@@ -233,14 +233,17 @@ The test framework will:
   - [x] C# Implementation
   - [x] Python Implementation
   - [x] Rust Implementation
-- ... (Days 4-25)
+- [x] Day 04 - Printing Department
+  - [x] C# Implementation
+  - [x] Python Implementation
+  - [x] Rust Implementation
+- ... (Days 5-25)
 
 ## 💡 Tips
 
 - **Read the problem carefully** - Advent of Code problems often have subtle details
 - **Test with examples first** - Always verify your solution works with the test input
 - **Start simple** - Get Part 1 working before thinking about Part 2
-- **Reuse code** - Part 2 often builds on Part 1's logic
 - **Share inputs carefully** - Don't share your puzzle inputs publicly (per AoC rules)
 
 ## 📚 Resources
