@@ -6,6 +6,7 @@ mod day02;
 mod day03;
 mod day04;
 mod day05;
+mod day06;
 
 fn main() {
     println!("\n{}", "=".repeat(50));
@@ -39,6 +40,9 @@ fn main() {
             }
             Ok(5) => {
                 day05::run();
+            }
+            Ok(6) => {
+                day06::run();
             }
             Ok(day) => {
                 println!("\n⚠ Day {} not implemented yet!\n", day);

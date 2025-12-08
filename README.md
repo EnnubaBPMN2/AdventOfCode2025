@@ -228,6 +228,26 @@ The test framework will:
 - [x] Day 02 - Gift Shop
   - [x] C# Implementation
   - [x] Python Implementation
+  - [x] Rust Implementation
+- [x] Day 03 - Printing Department
+  - [x] C# Implementation
+  - [x] Python Implementation
+  - [x] Rust Implementation
+- [x] Day 04 - Printing Department
+  - [x] C# Implementation
+  - [x] Python Implementation
+  - [x] Rust Implementation
+- [x] Day 05 - Cafeteria
+  - [x] C# Implementation
+  - [x] Python Implementation
+  - [x] Rust Implementation
+- [x] Day 06 - Trash Compactor (Math Worksheet)
+  - [x] C# Implementation
+  - [x] Python Implementation
+  - [x] Rust Implementation
+
+## 💡 Tips
+
 - **Read the problem carefully** - Advent of Code problems often have subtle details
 - **Test with examples first** - Always verify your solution works with the test input
 - **Start simple** - Get Part 1 working before thinking about Part 2
