@@ -245,6 +245,10 @@ The test framework will:
   - [x] C# Implementation
   - [x] Python Implementation
   - [x] Rust Implementation
+- [x] Day 07 - Laboratories (Tachyon Manifold)
+  - [x] C# Implementation
+  - [x] Python Implementation
+  - [x] Rust Implementation
 
 ## 💡 Tips
 
