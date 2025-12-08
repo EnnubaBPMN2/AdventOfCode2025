@@ -2,6 +2,7 @@
 
 from day01.solution import run as run_day01
 from day02.solution import run as run_day02
+from day03.solution import run as run_day03
 
 def main():
     print("\n" + "="*50)
@@ -22,6 +23,8 @@ def main():
             # Add more days here as you implement them
             elif day_num == 2:
                 run_day02()
+            elif day_num == 3:
+                run_day03()
             else:
                 print(f"\n⚠ Day {day_num} not implemented yet!\n")
                 

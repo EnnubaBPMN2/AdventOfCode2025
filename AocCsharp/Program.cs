@@ -1,5 +1,6 @@
 ﻿using AocCsharp.Day01;
 using AocCsharp.Day02;
+using AocCsharp.Day03;
 
 Console.Clear();
 Console.ForegroundColor = ConsoleColor.Green;
@@ -44,6 +45,9 @@ while (true)
             // Add more days here as you implement them
             case 2:
                 Day02.Run();
+                break;
+            case 3:
+                Day03.Run();
                 break;
             default:
                 Console.ForegroundColor = ConsoleColor.Yellow;

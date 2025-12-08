@@ -229,7 +229,10 @@ The test framework will:
   - [x] C# Implementation
   - [x] Python Implementation
   - [x] Rust Implementation
-- [ ] Day 03 - Lobby
+- [x] Day 03 - Lobby
+  - [x] C# Implementation
+  - [x] Python Implementation
+  - [x] Rust Implementation
 - ... (Days 4-25)
 
 ## 💡 Tips
