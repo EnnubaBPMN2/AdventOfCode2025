@@ -1,6 +1,7 @@
 """Input reading utilities for Advent of Code solutions"""
 
 import os
+import time
 from pathlib import Path
 
 def read_input(file_path: str) -> str:
@@ -61,16 +62,18 @@ def run_test(test_name: str, test_func, expected):
     Returns:
         True if test passed, False otherwise
     """
-    print(f"Running {test_name}... ", end='')
+    print(f"Running {test_name}... ", end='', flush=True)
     
     try:
+        start_time = time.perf_counter()
         result = test_func()
+        elapsed = time.perf_counter() - start_time
         passed = result == expected
         
         if passed:
-            print(f"✓ PASSED (Result: {result})")
+            print(f"✓ PASSED (Result: {result}) [{elapsed:.3f}s]")
         else:
-            print(f"✗ FAILED (Expected: {expected}, Got: {result})")
+            print(f"✗ FAILED (Expected: {expected}, Got: {result}) [{elapsed:.3f}s]")
         
         return passed
     except Exception as e:
@@ -99,13 +102,17 @@ def run_solution(part_name: str, solver, test_input_path: str, real_input_path: 
     # Run with real input
     if os.path.exists(real_input_path):
         real_input = read_input(real_input_path)
-        print(f"Running {part_name} (Real Input)... ", end='')
+        print(f"Running {part_name} (Real Input)... ", end='', flush=True)
         
         try:
+            start_time = time.perf_counter()
             result = solver(real_input)
-            print(f"Result: {result}")
+            elapsed = time.perf_counter() - start_time
+            print(f"Result: {result} [{elapsed:.3f}s]")
         except Exception as e:
             print(f"ERROR: {e}")
     else:
         print(f"⚠ Real input file not found: {real_input_path}")
         print("  Please download your puzzle input from https://adventofcode.com/2025/day/X/input")
+
+

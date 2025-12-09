@@ -13,18 +13,21 @@ public static class TestRunner
 
         try
         {
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             var result = testFunc();
+            stopwatch.Stop();
+            
             var passed = EqualityComparer<T>.Default.Equals(result, expected);
 
             if (passed)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"✓ PASSED (Result: {result})");
+                Console.WriteLine($"✓ PASSED (Result: {result}) [{stopwatch.Elapsed.TotalSeconds:F3}s]");
             }
             else
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"✗ FAILED (Expected: {expected}, Got: {result})");
+                Console.WriteLine($"✗ FAILED (Expected: {expected}, Got: {result}) [{stopwatch.Elapsed.TotalSeconds:F3}s]");
             }
             Console.ResetColor();
 
@@ -80,9 +83,12 @@ public static class TestRunner
 
             try
             {
+                var stopwatch = System.Diagnostics.Stopwatch.StartNew();
                 var result = solver(realInput);
+                stopwatch.Stop();
+                
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"Result: {result}");
+                Console.WriteLine($"Result: {result} [{stopwatch.Elapsed.TotalSeconds:F3}s]");
                 Console.ResetColor();
             }
             catch (Exception ex)

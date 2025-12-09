@@ -8,6 +8,7 @@ from day05.solution import run as run_day05
 from day06.solution import run as run_day06
 from day07.solution import run as run_day07
 from day08.solution import run as run_day08
+from day09.solution import run as run_day09
 
 def main():
     print("\n" + "="*50)
@@ -25,21 +26,32 @@ def main():
             
             if day_num == 1:
                 run_day01()
+                print()  # Add blank line after running a day
             # Add more days here as you implement them
             elif day_num == 2:
                 run_day02()
+                print()  # Add blank line after running a day
             elif day_num == 3:
                 run_day03()
+                print()  # Add blank line after running a day
             elif day_num == 4:
                 run_day04()
+                print()  # Add blank line after running a day
             elif day_num == 5:
                 run_day05()
+                print()  # Add blank line after running a day
             elif day_num == 6:
                 run_day06()
+                print()  # Add blank line after running a day
             elif day_num == 7:
                 run_day07()
+                print()  # Add blank line after running a day
             elif day_num == 8:
                 run_day08()
+                print()  # Add blank line after running a day
+            elif day_num == 9:
+                run_day09()
+                print()  # Add blank line after running a day
             else:
                 print(f"\n⚠ Day {day_num} not implemented yet!\n")
                 

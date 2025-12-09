@@ -1,5 +1,6 @@
 use std::fs;
 use std::path::Path;
+use std::time::Instant;
 
 /// Reads the entire content of a file as a single string
 pub fn read_input(file_path: &str) -> Result<String, std::io::Error> {
@@ -33,13 +34,16 @@ pub fn run_test<T: std::fmt::Display + PartialEq>(
 ) -> bool {
     print!("Running {}... ", test_name);
     
+    let start = Instant::now();
     let result = test_func();
+    let elapsed = start.elapsed();
+    
     let passed = result == expected;
     
     if passed {
-        println!("✓ PASSED (Result: {})", result);
+        println!("✓ PASSED (Result: {}) [{:.3}s]", result, elapsed.as_secs_f64());
     } else {
-        println!("✗ FAILED (Expected: {}, Got: {})", expected, result);
+        println!("✗ FAILED (Expected: {}, Got: {}) [{:.3}s]", expected, result, elapsed.as_secs_f64());
     }
     
     passed
@@ -75,8 +79,10 @@ pub fn run_solution<T: std::fmt::Display>(
         match read_input(real_input_path) {
             Ok(real_input) => {
                 print!("Running {} (Real Input)... ", part_name);
+                let start = Instant::now();
                 let result = solver(&real_input);
-                println!("Result: {}", result);
+                let elapsed = start.elapsed();
+                println!("Result: {} [{:.3}s]", result, elapsed.as_secs_f64());
             }
             Err(e) => {
                 println!("ERROR: {}", e);

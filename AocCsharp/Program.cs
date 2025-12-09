@@ -6,16 +6,12 @@ using AocCsharp.Day05;
 using AocCsharp.Day06;
 using AocCsharp.Day07;
 using AocCsharp.Day08;
+using AocCsharp.Day09;
 
-Console.Clear();
-Console.ForegroundColor = ConsoleColor.Green;
-Console.WriteLine("╔════════════════════════════════════════════════╗");
-Console.WriteLine("║                                                ║");
-Console.WriteLine("║      🎄 Advent of Code 2025 🎄                ║");
-Console.WriteLine("║         C# Solutions                           ║");
-Console.WriteLine("║                                                ║");
-Console.WriteLine("╚════════════════════════════════════════════════╝");
-Console.ResetColor();
+Console.WriteLine();
+Console.WriteLine("==================================================");
+Console.WriteLine("🎄 Advent of Code 2025 - C# Solutions 🎄");
+Console.WriteLine("==================================================");
 Console.WriteLine();
 
 while (true)
@@ -67,6 +63,9 @@ while (true)
                 break;
             case 8:
                 Day08.Run();
+                break;
+            case 9:
+                Day09.Run();
                 break;
             default:
                 Console.ForegroundColor = ConsoleColor.Yellow;
