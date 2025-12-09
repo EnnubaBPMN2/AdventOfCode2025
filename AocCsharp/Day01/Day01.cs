@@ -6,14 +6,6 @@ public static class Day01
 {
     public static void Run()
     {
-        Console.WriteLine();
-        Console.ForegroundColor = ConsoleColor.Magenta;
-        Console.WriteLine("╔════════════════════════════════════════╗");
-        Console.WriteLine("║     Advent of Code 2025 - Day 01      ║");
-        Console.WriteLine("║         Secret Entrance                ║");
-        Console.WriteLine("╚════════════════════════════════════════╝");
-        Console.ResetColor();
-
         var testInputPath = Path.Combine("..", "inputs", "day01_test.txt");
         var inputPath = Path.Combine("..", "inputs", "day01.txt");
 

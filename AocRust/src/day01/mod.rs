@@ -75,11 +75,6 @@ pub fn part2(input: &str) -> i32 {
 
 /// Run Day 01 solutions
 pub fn run() {
-    println!("\n{}", "=".repeat(50));
-    println!("    Advent of Code 2025 - Day 01");
-    println!("         Secret Entrance");
-    println!("{}", "=".repeat(50));
-    
     let test_input_path = "../inputs/day01_test.txt";
     let input_path = "../inputs/day01.txt";
     

@@ -73,11 +73,6 @@ def part2(input_text: str) -> int:
 
 def run():
     """Run Day 01 solutions"""
-    print("\n" + "="*50)
-    print("    Advent of Code 2025 - Day 01")
-    print("         Secret Entrance")
-    print("="*50)
-    
     # Get the directory where this file is located
     day_dir = os.path.dirname(os.path.abspath(__file__))
     # Go up two levels to reach solution root, then into inputs
@@ -102,3 +97,4 @@ def run():
         input_path,
         expected_test_result=6
     )
+
