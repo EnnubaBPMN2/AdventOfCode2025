@@ -19,8 +19,16 @@ pub fn part1(input: &str) -> i64 {
     let height = lines.len();
     let width = lines.iter().map(|line| line.len()).max().unwrap_or(0);
 
-    // Pad lines to ensure they are all the same length
-    let grid: Vec<String> = lines.iter().map(|line| format!("{:width$}", line, width = width)).collect();
+    // OPTIMIZATION: Convert to Vec<Vec<u8>> for O(1) character access
+    // This fixes the O(n) chars().nth() bottleneck
+    let grid: Vec<Vec<u8>> = lines
+        .iter()
+        .map(|line| {
+            let mut bytes = line.as_bytes().to_vec();
+            bytes.resize(width, b' ');
+            bytes
+        })
+        .collect();
 
     let mut problems: Vec<(Vec<i64>, char)> = Vec::new();
     let mut start_col: Option<usize> = None;
@@ -28,7 +36,8 @@ pub fn part1(input: &str) -> i64 {
     for col in 0..width {
         let mut is_empty_col = true;
         for row in 0..height {
-            if grid[row].chars().nth(col).unwrap() != ' ' {
+            // O(1) access instead of O(n) chars().nth()
+            if grid[row][col] != b' ' {
                 is_empty_col = false;
                 break;
             }
@@ -68,7 +77,7 @@ pub fn part1(input: &str) -> i64 {
     total
 }
 
-fn parse_problem(grid: &[String], start_col: usize, end_col: usize) -> (Vec<i64>, char) {
+fn parse_problem(grid: &[Vec<u8>], start_col: usize, end_col: usize) -> (Vec<i64>, char) {
     let mut numbers: Vec<i64> = Vec::new();
     let mut op = ' ';
 
@@ -76,7 +85,7 @@ fn parse_problem(grid: &[String], start_col: usize, end_col: usize) -> (Vec<i64>
 
     // Numbers are in all rows except the last
     for row in 0..height - 1 {
-        let substring: String = grid[row][start_col..=end_col].trim().to_string();
+        let substring = String::from_utf8_lossy(&grid[row][start_col..=end_col]).trim().to_string();
         if !substring.is_empty() {
             if let Ok(num) = substring.parse::<i64>() {
                 numbers.push(num);
@@ -85,7 +94,7 @@ fn parse_problem(grid: &[String], start_col: usize, end_col: usize) -> (Vec<i64>
     }
 
     // Operator is in the last row
-    let op_string: String = grid[height - 1][start_col..=end_col].trim().to_string();
+    let op_string = String::from_utf8_lossy(&grid[height - 1][start_col..=end_col]).trim().to_string();
     if !op_string.is_empty() {
         op = op_string.chars().next().unwrap();
     }
@@ -104,8 +113,15 @@ pub fn part2(input: &str) -> i64 {
     let height = lines.len();
     let width = lines.iter().map(|line| line.len()).max().unwrap_or(0);
 
-    // Pad lines to ensure they are all the same length
-    let grid: Vec<String> = lines.iter().map(|line| format!("{:width$}", line, width = width)).collect();
+    // OPTIMIZATION: Convert to Vec<Vec<u8>> for O(1) character access
+    let grid: Vec<Vec<u8>> = lines
+        .iter()
+        .map(|line| {
+            let mut bytes = line.as_bytes().to_vec();
+            bytes.resize(width, b' ');
+            bytes
+        })
+        .collect();
 
     let mut problems: Vec<(Vec<i64>, char)> = Vec::new();
     let mut start_col: Option<usize> = None;
@@ -113,7 +129,8 @@ pub fn part2(input: &str) -> i64 {
     for col in 0..width {
         let mut is_empty_col = true;
         for row in 0..height {
-            if grid[row].chars().nth(col).unwrap() != ' ' {
+            // O(1) access instead of O(n) chars().nth()
+            if grid[row][col] != b' ' {
                 is_empty_col = false;
                 break;
             }
@@ -153,7 +170,7 @@ pub fn part2(input: &str) -> i64 {
     total
 }
 
-fn parse_problem_right_to_left(grid: &[String], start_col: usize, end_col: usize) -> (Vec<i64>, char) {
+fn parse_problem_right_to_left(grid: &[Vec<u8>], start_col: usize, end_col: usize) -> (Vec<i64>, char) {
     let mut numbers: Vec<i64> = Vec::new();
     let mut op = ' ';
 
@@ -161,19 +178,20 @@ fn parse_problem_right_to_left(grid: &[String], start_col: usize, end_col: usize
 
     // Read each column from right to left
     for col in (start_col..=end_col).rev() {
-        let mut digit_chars: Vec<char> = Vec::new();
+        let mut digit_chars: Vec<u8> = Vec::new();
 
         // Read digits from top to bottom in this column (rows 0 to height-2, excluding operator row)
         for row in 0..height - 1 {
-            let c = grid[row].chars().nth(col).unwrap();
-            if c != ' ' {
+            // O(1) access instead of O(n) chars().nth()
+            let c = grid[row][col];
+            if c != b' ' {
                 digit_chars.push(c);
             }
         }
 
         // Build number from these digits
         if !digit_chars.is_empty() {
-            let num_str: String = digit_chars.iter().collect();
+            let num_str = String::from_utf8_lossy(&digit_chars).to_string();
             if let Ok(num) = num_str.parse::<i64>() {
                 numbers.push(num);
             }
@@ -182,7 +200,8 @@ fn parse_problem_right_to_left(grid: &[String], start_col: usize, end_col: usize
 
     // Operator is in the last row - find it anywhere in this block
     for col in start_col..=end_col {
-        let c = grid[height - 1].chars().nth(col).unwrap();
+        // O(1) access instead of O(n) chars().nth()
+        let c = grid[height - 1][col] as char;
         if c == '+' || c == '*' {
             op = c;
             break;

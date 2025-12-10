@@ -44,12 +44,13 @@ def part2(input_text: str) -> int:
     """
     Find the largest rectangle area using red tiles as corners,
     where all tiles in the rectangle are red or green (inside the polygon).
+    HIGHLY OPTIMIZED VERSION: Aggressive inlining and loop reduction.
     """
     lines = input_text.strip().split('\n')
     if not lines:
         return 0
-    
-    # Parse red tile coordinates
+
+    # Parse red tile coordinates as list for fastest iteration
     red_tiles = []
     for line in lines:
         parts = line.split(',')
@@ -57,64 +58,142 @@ def part2(input_text: str) -> int:
             x = int(parts[0].strip())
             y = int(parts[1].strip())
             red_tiles.append((x, y))
-    
-    if len(red_tiles) < 2:
+
+    n = len(red_tiles)
+    if n < 2:
         return 0
-    
+
     max_area = 0
-    
+
     # Try all pairs of red tiles as opposite corners
-    for i in range(len(red_tiles)):
-        for j in range(i + 1, len(red_tiles)):
-            tile1 = red_tiles[i]
-            tile2 = red_tiles[j]
-            
-            rect_min_x = min(tile1[0], tile2[0])
-            rect_max_x = max(tile1[0], tile2[0])
-            rect_min_y = min(tile1[1], tile2[1])
-            rect_max_y = max(tile1[1], tile2[1])
-            
-            # Check if all four corners are inside or on the polygon boundary
-            if not is_inside_or_on_boundary((rect_min_x, rect_min_y), red_tiles):
-                continue
-            if not is_inside_or_on_boundary((rect_min_x, rect_max_y), red_tiles):
-                continue
-            if not is_inside_or_on_boundary((rect_max_x, rect_min_y), red_tiles):
-                continue
-            if not is_inside_or_on_boundary((rect_max_x, rect_max_y), red_tiles):
-                continue
-            
-            # Check if any red tile is strictly inside the rectangle
-            has_interior_tile = False
-            for tile in red_tiles:
-                if (tile[0] > rect_min_x and tile[0] < rect_max_x and 
-                    tile[1] > rect_min_y and tile[1] < rect_max_y):
-                    has_interior_tile = True
+    for i in range(n):
+        x1, y1 = red_tiles[i]
+
+        for j in range(i + 1, n):
+            x2, y2 = red_tiles[j]
+
+            rect_min_x = min(x1, x2)
+            rect_max_x = max(x1, x2)
+            rect_min_y = min(y1, y2)
+            rect_max_y = max(y1, y2)
+
+            # Quick reject: Check if any tile is strictly inside
+            has_interior = False
+            for tx, ty in red_tiles:
+                if rect_min_x < tx < rect_max_x and rect_min_y < ty < rect_max_y:
+                    has_interior = True
                     break
-            
-            if has_interior_tile:
+            if has_interior:
                 continue
-            
-            # Check if any polygon edge properly crosses the rectangle boundary
+
+            # Check all 4 corners are inside or on boundary
+            corners_valid = True
+            for cx, cy in [(rect_min_x, rect_min_y), (rect_min_x, rect_max_y),
+                          (rect_max_x, rect_min_y), (rect_max_x, rect_max_y)]:
+
+                on_boundary = False
+                # Check if corner is on any edge
+                for k in range(n):
+                    p1x, p1y = red_tiles[k]
+                    p2x, p2y = red_tiles[(k + 1) % n]
+
+                    # Vertical edge check
+                    if p1x == p2x == cx:
+                        if min(p1y, p2y) <= cy <= max(p1y, p2y):
+                            on_boundary = True
+                            break
+                    # Horizontal edge check
+                    elif p1y == p2y == cy:
+                        if min(p1x, p2x) <= cx <= max(p1x, p2x):
+                            on_boundary = True
+                            break
+
+                if not on_boundary:
+                    # Ray casting for interior check
+                    intersections = 0
+                    for k in range(n):
+                        p1x, p1y = red_tiles[k]
+                        p2x, p2y = red_tiles[(k + 1) % n]
+
+                        if (p1y > cy) != (p2y > cy):
+                            intersect_x = (p2x - p1x) * (cy - p1y) / (p2y - p1y) + p1x
+                            if cx < intersect_x:
+                                intersections += 1
+
+                    if (intersections % 2) == 0:
+                        corners_valid = False
+                        break
+
+            if not corners_valid:
+                continue
+
+            # Check polygon edges don't cross rectangle
             has_crossing = False
-            for k in range(len(red_tiles)):
-                p1 = red_tiles[k]
-                p2 = red_tiles[(k + 1) % len(red_tiles)]
-                
-                # Check if edge crosses any rectangle side
-                if (segments_properly_intersect(p1, p2, (rect_min_x, rect_min_y), (rect_max_x, rect_min_y)) or
-                    segments_properly_intersect(p1, p2, (rect_min_x, rect_max_y), (rect_max_x, rect_max_y)) or
-                    segments_properly_intersect(p1, p2, (rect_min_x, rect_min_y), (rect_min_x, rect_max_y)) or
-                    segments_properly_intersect(p1, p2, (rect_max_x, rect_min_y), (rect_max_x, rect_max_y))):
+            for k in range(n):
+                if has_crossing:
+                    break
+
+                p1x, p1y = red_tiles[k]
+                p2x, p2y = red_tiles[(k + 1) % n]
+
+                # Check against all 4 rectangle edges
+                # Bottom edge
+                val1 = (p1y - rect_min_y) * (rect_max_x - rect_min_x)
+                d1 = 0 if val1 == 0 else (1 if val1 > 0 else -1)
+                val2 = (p2y - rect_min_y) * (rect_max_x - rect_min_x)
+                d2 = 0 if val2 == 0 else (1 if val2 > 0 else -1)
+                val3 = (rect_min_y - p1y) * (p2x - p1x) - (p2y - p1y) * (rect_min_x - p1x)
+                d3 = 0 if val3 == 0 else (1 if val3 > 0 else -1)
+                val4 = (rect_min_y - p1y) * (p2x - p1x) - (p2y - p1y) * (rect_max_x - p1x)
+                d4 = 0 if val4 == 0 else (1 if val4 > 0 else -1)
+                if ((d1 > 0 and d2 < 0) or (d1 < 0 and d2 > 0)) and ((d3 > 0 and d4 < 0) or (d3 < 0 and d4 > 0)):
                     has_crossing = True
                     break
-            
+
+                # Top edge
+                val1 = (p1y - rect_max_y) * (rect_max_x - rect_min_x)
+                d1 = 0 if val1 == 0 else (1 if val1 > 0 else -1)
+                val2 = (p2y - rect_max_y) * (rect_max_x - rect_min_x)
+                d2 = 0 if val2 == 0 else (1 if val2 > 0 else -1)
+                val3 = (rect_max_y - p1y) * (p2x - p1x) - (p2y - p1y) * (rect_min_x - p1x)
+                d3 = 0 if val3 == 0 else (1 if val3 > 0 else -1)
+                val4 = (rect_max_y - p1y) * (p2x - p1x) - (p2y - p1y) * (rect_max_x - p1x)
+                d4 = 0 if val4 == 0 else (1 if val4 > 0 else -1)
+                if ((d1 > 0 and d2 < 0) or (d1 < 0 and d2 > 0)) and ((d3 > 0 and d4 < 0) or (d3 < 0 and d4 > 0)):
+                    has_crossing = True
+                    break
+
+                # Left edge
+                val1 = (p1x - rect_min_x) * (rect_max_y - rect_min_y)
+                d1 = 0 if val1 == 0 else (1 if val1 > 0 else -1)
+                val2 = (p2x - rect_min_x) * (rect_max_y - rect_min_y)
+                d2 = 0 if val2 == 0 else (1 if val2 > 0 else -1)
+                val3 = (rect_min_y - p1y) * (p2x - p1x) - (p2y - p1y) * (rect_min_x - p1x)
+                d3 = 0 if val3 == 0 else (1 if val3 > 0 else -1)
+                val4 = (rect_max_y - p1y) * (p2x - p1x) - (p2y - p1y) * (rect_min_x - p1x)
+                d4 = 0 if val4 == 0 else (1 if val4 > 0 else -1)
+                if ((d1 > 0 and d2 < 0) or (d1 < 0 and d2 > 0)) and ((d3 > 0 and d4 < 0) or (d3 < 0 and d4 > 0)):
+                    has_crossing = True
+                    break
+
+                # Right edge
+                val1 = (p1x - rect_max_x) * (rect_max_y - rect_min_y)
+                d1 = 0 if val1 == 0 else (1 if val1 > 0 else -1)
+                val2 = (p2x - rect_max_x) * (rect_max_y - rect_min_y)
+                d2 = 0 if val2 == 0 else (1 if val2 > 0 else -1)
+                val3 = (rect_min_y - p1y) * (p2x - p1x) - (p2y - p1y) * (rect_max_x - p1x)
+                d3 = 0 if val3 == 0 else (1 if val3 > 0 else -1)
+                val4 = (rect_max_y - p1y) * (p2x - p1x) - (p2y - p1y) * (rect_max_x - p1x)
+                d4 = 0 if val4 == 0 else (1 if val4 > 0 else -1)
+                if ((d1 > 0 and d2 < 0) or (d1 < 0 and d2 > 0)) and ((d3 > 0 and d4 < 0) or (d3 < 0 and d4 > 0)):
+                    has_crossing = True
+                    break
+
             if not has_crossing:
-                width = rect_max_x - rect_min_x + 1
-                height = rect_max_y - rect_min_y + 1
-                area = width * height
-                max_area = max(max_area, area)
-    
+                area = (rect_max_x - rect_min_x + 1) * (rect_max_y - rect_min_y + 1)
+                if area > max_area:
+                    max_area = area
+
     return max_area
 
 

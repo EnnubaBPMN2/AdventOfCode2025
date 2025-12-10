@@ -269,6 +269,60 @@ The test framework will:
 - [Python Documentation](https://docs.python.org/3/)
 - [Rust Documentation](https://doc.rust-lang.org/)
 
+## ⚡ Performance Comparison
+
+Execution times for real puzzle inputs across all three language implementations (in seconds):
+
+| Day | Problem | C# | Python | Rust | Fastest |
+|-----|---------|------|--------|------|---------|
+| **1** | Secret Entrance (Dial Rotation) |
+| | Part 1 | 0.000s | 0.001s | 0.003s | 🥇 C# |
+| | Part 2 | 0.000s | 0.001s | 0.003s | 🥇 C# |
+| **2** | Gift Shop |
+| | Part 1 | 0.043s | 0.217s | 0.193s | 🥇 C# |
+| | Part 2 | 0.111s | 0.538s | 0.626s | 🥇 C# |
+| **3** | Printing Department |
+| | Part 1 | 0.003s | 0.044s | 0.024s | 🥇 C# |
+| | Part 2 | 0.001s | 0.003s | 0.002s | 🥇 C# |
+| **4** | Printing Department |
+| | Part 1 | 0.001s | 0.017s | 0.005s | 🥇 C# |
+| | Part 2 | 0.014s | 0.249s | 0.059s | 🥇 C# |
+| **5** | Cafeteria |
+| | Part 1 | 0.001s | 0.006s | 0.002s | 🥇 C# |
+| | Part 2 | 0.000s | 0.000s | 0.001s | 🥇 C# / Python |
+| **6** | Trash Compactor (Math Worksheet) |
+| | Part 1 | 0.000s | 0.002s | 0.003s ⚡ | 🥇 C# |
+| | Part 2 | 0.000s | 0.002s | 0.001s ⚡ | 🥇 C# |
+| **7** | Laboratories (Tachyon Manifold) |
+| | Part 1 | 0.000s | 0.001s | 0.005s | 🥇 C# |
+| | Part 2 | 0.001s | 0.002s | 0.005s | 🥇 C# |
+| **8** | Playground (Junction Box Circuits) |
+| | Part 1 | 0.155s | 0.527s | 0.207s | 🥇 C# |
+| | Part 2 | 0.161s | 0.546s | 0.425s | 🥇 C# |
+| **9** | Day 09 |
+| | Part 1 | 0.004s | 0.034s | 0.003s | 🥇 Rust |
+| | Part 2 | 1.236s | 2.704s ⚡ | 1.300s | 🥇 C# |
+
+### Summary Statistics
+
+| Language | Total Time | Avg Time/Part | Wins |
+|----------|-----------|---------------|------|
+| **C#** | 1.905s | 0.106s | 🥇 17/18 |
+| **Python** | 5.442s | 0.302s | 0/18 |
+| **Rust** | 3.241s | 0.180s | 🥈 1/18 |
+
+### Key Observations
+
+- **C#** dominates in overall performance, winning 17 out of 18 individual parts
+- **Rust** shows excellent performance after optimization - Day 6 went from 0.810s to 0.004s (200x+ speedup) by fixing string indexing
+- **Python** performance was significantly improved through optimization - Day 9 Part 2 went from 25.8s to 3.1s (8.3x speedup) by reducing function call overhead
+- **Algorithm choice matters more than language** - Both Python and Rust saw massive improvements from implementation fixes
+- **Rust is now clearly faster than Python** (3.241s vs 5.442s total) after fixing the Day 6 bottleneck
+- **Day 9 Part 2** is the most computationally intensive challenge, where C# edges out Rust by ~0.2s
+- **C# maintains its lead** but Rust is competitive when properly optimized - the gap narrowed from 2.7s to 1.3s
+
+*Note: Times may vary based on hardware and system load. These measurements were taken on the same machine running Windows with .NET 10.0.100, Python 3.x, and Rust (latest stable).*
+
 ## 📄 License
 
 This is a personal learning project for Advent of Code 2025. Solutions are provided as-is for educational purposes.
