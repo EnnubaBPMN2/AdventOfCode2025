@@ -10,6 +10,7 @@ mod day06;
 mod day07;
 mod day08;
 mod day09;
+mod day10;
 
 fn main() {
     println!("\n{}", "=".repeat(50));
@@ -63,6 +64,10 @@ fn main() {
             }
             Ok(9) => {
                 day09::run();
+                println!(); // Add blank line after running a day
+            }
+            Ok(10) => {
+                day10::run();
                 println!(); // Add blank line after running a day
             }
             Ok(day) => {

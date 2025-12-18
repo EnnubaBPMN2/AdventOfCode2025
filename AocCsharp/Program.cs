@@ -7,6 +7,7 @@ using AocCsharp.Day06;
 using AocCsharp.Day07;
 using AocCsharp.Day08;
 using AocCsharp.Day09;
+using AocCsharp.Day10;
 
 Console.WriteLine();
 Console.WriteLine("==================================================");
@@ -66,6 +67,9 @@ while (true)
                 break;
             case 9:
                 Day09.Run();
+                break;
+            case 10:
+                Day10.Run();
                 break;
             default:
                 Console.ForegroundColor = ConsoleColor.Yellow;
