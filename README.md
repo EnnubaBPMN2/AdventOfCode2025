@@ -253,6 +253,14 @@ The test framework will:
   - [x] C# Implementation
   - [x] Python Implementation
   - [x] Rust Implementation
+- [x] Day 09 - Day 09
+  - [x] C# Implementation
+  - [x] Python Implementation
+  - [x] Rust Implementation
+- [x] Day 10 - Factory (Indicator Lights & Joltage Counters)
+  - [x] C# Implementation
+  - [x] Python Implementation
+  - [x] Rust Implementation
 
 ## 💡 Tips
 
@@ -302,24 +310,27 @@ Execution times for real puzzle inputs across all three language implementations
 | **9** | Day 09 |
 | | Part 1 | 0.004s | 0.034s | 0.003s | 🥇 Rust |
 | | Part 2 | 1.236s | 2.704s ⚡ | 1.300s | 🥇 C# |
+| **10** | Factory (Indicator Lights & Joltage Counters) |
+| | Part 1 | 0.002s | 0.011s | 0.172s | 🥇 C# |
+| | Part 2 | 0.155s | 1.447s | 0.644s | 🥇 C# |
 
 ### Summary Statistics
 
 | Language | Total Time | Avg Time/Part | Wins |
 |----------|-----------|---------------|------|
-| **C#** | 1.905s | 0.106s | 🥇 17/18 |
-| **Python** | 5.442s | 0.302s | 0/18 |
-| **Rust** | 3.241s | 0.180s | 🥈 1/18 |
+| **C#** | 2.062s | 0.103s | 🥇 19/20 |
+| **Python** | 6.900s | 0.345s | 0/20 |
+| **Rust** | 4.057s | 0.203s | 🥈 1/20 |
 
 ### Key Observations
 
-- **C#** dominates in overall performance, winning 17 out of 18 individual parts
+- **C#** dominates in overall performance, winning 19 out of 20 individual parts
 - **Rust** shows excellent performance after optimization - Day 6 went from 0.810s to 0.004s (200x+ speedup) by fixing string indexing
 - **Python** performance was significantly improved through optimization - Day 9 Part 2 went from 25.8s to 3.1s (8.3x speedup) by reducing function call overhead
 - **Algorithm choice matters more than language** - Both Python and Rust saw massive improvements from implementation fixes
-- **Rust is now clearly faster than Python** (3.241s vs 5.442s total) after fixing the Day 6 bottleneck
-- **Day 9 Part 2** is the most computationally intensive challenge, where C# edges out Rust by ~0.2s
-- **C# maintains its lead** but Rust is competitive when properly optimized - the gap narrowed from 2.7s to 1.3s
+- **Rust is now clearly faster than Python** (4.057s vs 6.900s total) after fixing the Day 6 bottleneck
+- **Day 9 Part 2** remains the most computationally intensive challenge so far, where C# edges out Rust by ~0.2s
+- **C# maintains its lead** but Rust is competitive when properly optimized - the gap is approximately 2 seconds across 20 parts
 
 *Note: Times may vary based on hardware and system load. These measurements were taken on the same machine running Windows with .NET 10.0.100, Python 3.x, and Rust (latest stable).*
 
