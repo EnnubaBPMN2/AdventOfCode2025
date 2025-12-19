@@ -3,20 +3,27 @@ from utils.input_reader import run_solution
 
 
 class Shape:
-    """Optimized shape representation with precomputed cell positions."""
-    __slots__ = ('cells', 'width', 'height', 'area', 'cell_count')
+    """Optimized shape representation matching C# implementation exactly."""
+    __slots__ = ('rows', 'cols', 'cell_count', 'width', 'height', 'area')
 
     def __init__(self, shape_lines):
         """Parse shape and precompute all necessary data."""
-        # Store as tuple of tuples for immutability and speed
+        # Collect cells first
         cells = []
         for r, line in enumerate(shape_lines):
             for c, cell in enumerate(line):
                 if cell == '#':
                     cells.append((r, c))
 
-        self.cells = tuple(cells)  # Immutable tuple is faster
+        # Store as separate arrays like C#
         self.cell_count = len(cells)
+        self.rows = [0] * self.cell_count
+        self.cols = [0] * self.cell_count
+
+        for i, (r, c) in enumerate(cells):
+            self.rows[i] = r
+            self.cols[i] = c
+
         self.height = len(shape_lines)
         self.width = max(len(line) for line in shape_lines) if shape_lines else 0
         self.area = self.cell_count
@@ -30,7 +37,7 @@ def part1(input_text: str) -> int:
     shapes, regions = parse_input(input_text)
 
     # Precompute all shape orientations once
-    all_orientations = tuple(tuple(get_all_orientations(shape)) for shape in shapes)
+    all_orientations = [get_all_orientations(shape) for shape in shapes]
 
     count = 0
     for region in regions:
@@ -57,7 +64,7 @@ def parse_input(input_text: str):
             width = int(dimensions[0])
             height = int(dimensions[1])
 
-            counts = tuple(map(int, parts[1].strip().split()))
+            counts = list(map(int, parts[1].strip().split()))
             regions.append((width, height, counts))
             i += 1
         # Parse shape
@@ -83,19 +90,20 @@ def can_fit_all_presents(region, all_orientations):
 
     # Quick area check
     total_area = width * height
-    required_area = sum(
-        all_orientations[i][0].area * count
-        for i, count in enumerate(counts) if count > 0
-    )
+    required_area = 0
+
+    for i, count in enumerate(counts):
+        if count > 0:
+            required_area += all_orientations[i][0].area * count
 
     if required_area > total_area:
         return False
 
-    # Use bytearray for grid - much faster than list for boolean operations
-    grid = bytearray(width * height)
-    counts_list = list(counts)
+    # Use list of False for grid - simpler than bytearray
+    grid = [False] * (width * height)
+    counts_mutable = counts[:]
 
-    return try_place_presents(grid, width, height, counts_list, all_orientations, 0)
+    return try_place_presents(grid, width, height, counts_mutable, all_orientations, 0)
 
 
 def try_place_presents(grid, width, height, counts, all_orientations, call_count):
@@ -103,59 +111,50 @@ def try_place_presents(grid, width, height, counts, all_orientations, call_count
     if call_count > 2000000:
         return False
 
-    # Check if all presents are placed - cache len for speed
-    counts_len = len(counts)
-    for i in range(counts_len):
+    # Check if all presents are placed - match C# logic exactly
+    all_placed = True
+    for i in range(len(counts)):
         if counts[i] > 0:
+            all_placed = False
             break
-    else:
-        return True  # All counts are 0
+    if all_placed:
+        return True
 
     # Try placing first available present type
-    for shape_idx in range(counts_len):
-        count = counts[shape_idx]
-        if count == 0:
+    for shape_idx in range(len(counts)):
+        if counts[shape_idx] == 0:
             continue
 
         orientations = all_orientations[shape_idx]
 
         # Try each orientation at each position
         for shape in orientations:
-            # Cache shape attributes to avoid repeated lookups
-            shape_height = shape.height
-            shape_width = shape.width
-            shape_cells = shape.cells
-            shape_cell_count = shape.cell_count
-
-            max_row = height - shape_height
-            max_col = width - shape_width
-
-            for row in range(max_row + 1):
-                for col in range(max_col + 1):
-                    # Inline can_place_shape for speed
+            # Match C# loop structure exactly
+            for row in range(height - shape.height + 1):
+                for col in range(width - shape.width + 1):
+                    # Inline can_place_shape - match C# exactly
                     can_place = True
-                    for i in range(shape_cell_count):
-                        r, c = shape_cells[i]
-                        grid_idx = (row + r) * width + (col + c)
+                    for i in range(shape.cell_count):
+                        grid_idx = (row + shape.rows[i]) * width + (col + shape.cols[i])
                         if grid[grid_idx]:
                             can_place = False
                             break
 
                     if can_place:
-                        # Place shape
-                        for i in range(shape_cell_count):
-                            r, c = shape_cells[i]
-                            grid[(row + r) * width + (col + c)] = 1
+                        # Place shape - match C# exactly
+                        for i in range(shape.cell_count):
+                            grid_idx = (row + shape.rows[i]) * width + (col + shape.cols[i])
+                            grid[grid_idx] = True
 
                         counts[shape_idx] -= 1
 
                         if try_place_presents(grid, width, height, counts, all_orientations, call_count + 1):
                             return True
 
-                        # Backtrack - remove shape
-                        for i in range(shape_cell_count):
-                            r, c = shape_cells[i]
-                            grid[(row + r) * width + (col + c)] = 0
+                        # Remove shape - match C# exactly
+                        for i in range(shape.cell_count):
+                            grid_idx = (row + shape.rows[i]) * width + (col + shape.cols[i])
+                            grid[grid_idx] = False
 
                         counts[shape_idx] += 1
 
