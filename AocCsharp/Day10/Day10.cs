@@ -339,7 +339,6 @@ public static class Day10
         if (freeVars.Count == 0)
         {
             int[] solution = new int[numButtons];
-            bool valid = true;
 
             for (int r = 0; r < numCounters; r++)
             {

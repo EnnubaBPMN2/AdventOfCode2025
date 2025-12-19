@@ -261,6 +261,14 @@ The test framework will:
   - [x] C# Implementation
   - [x] Python Implementation
   - [x] Rust Implementation
+- [x] Day 11 - Reactor (Path Finding)
+  - [x] C# Implementation
+  - [x] Python Implementation
+  - [x] Rust Implementation
+- [x] Day 12 - Christmas Tree Farm (2D Shape Packing)
+  - [x] C# Implementation
+  - [x] Python Implementation
+  - [x] Rust Implementation
 
 ## 💡 Tips
 
@@ -313,24 +321,32 @@ Execution times for real puzzle inputs across all three language implementations
 | **10** | Factory (Indicator Lights & Joltage Counters) |
 | | Part 1 | 0.002s | 0.011s | 0.172s | 🥇 C# |
 | | Part 2 | 0.155s | 1.447s | 0.644s | 🥇 C# |
+| **11** | Reactor (Path Finding) |
+| | Part 1 | 0.000s | 0.001s | 0.002s | 🥇 C# |
+| | Part 2 | 0.001s | 0.003s | 0.005s | 🥇 C# |
+| **12** | Christmas Tree Farm (2D Shape Packing) |
+| | Part 1 | 2.715s | 15.523s ⚡ | 0.623s | 🥇 Rust |
+| | Part 2 | *Auto* | *Auto* | *Auto* | - |
 
 ### Summary Statistics
 
 | Language | Total Time | Avg Time/Part | Wins |
 |----------|-----------|---------------|------|
-| **C#** | 2.062s | 0.103s | 🥇 19/20 |
-| **Python** | 6.900s | 0.345s | 0/20 |
-| **Rust** | 4.057s | 0.203s | 🥈 1/20 |
+| **C#** | 4.778s | 0.209s | 🥇 21/23 |
+| **Python** | 22.427s | 0.975s | 0/23 |
+| **Rust** | 4.687s | 0.204s | 🥈 2/23 |
 
 ### Key Observations
 
-- **C#** dominates in overall performance, winning 19 out of 20 individual parts
+- **C# and Rust are neck-and-neck** with nearly identical total times (4.778s vs 4.687s) - Rust edges ahead by 0.091s!
+- **C#** still wins most individual parts (21/23), but **Rust** is showing competitive performance
+- **Day 12** is Rust's second victory - backtracking algorithms benefit from Rust's low-level optimizations
+- **Python** was heavily optimized for Day 12 (144s → 15s test) through pre-computation and in-place modifications, but remains ~5x slower than compiled languages
 - **Rust** shows excellent performance after optimization - Day 6 went from 0.810s to 0.004s (200x+ speedup) by fixing string indexing
-- **Python** performance was significantly improved through optimization - Day 9 Part 2 went from 25.8s to 3.1s (8.3x speedup) by reducing function call overhead
 - **Algorithm choice matters more than language** - Both Python and Rust saw massive improvements from implementation fixes
-- **Rust is now clearly faster than Python** (4.057s vs 6.900s total) after fixing the Day 6 bottleneck
-- **Day 9 Part 2** remains the most computationally intensive challenge so far, where C# edges out Rust by ~0.2s
-- **C# maintains its lead** but Rust is competitive when properly optimized - the gap is approximately 2 seconds across 20 parts
+- **Rust is now clearly faster than Python** (4.687s vs 22.427s total) after optimization
+- **Day 12** is the most computationally intensive challenge so far - backtracking through 2D shape packing with 1000 regions
+- **Day 11** demonstrates excellent memoization efficiency - all languages completed in under 10ms despite 417 trillion possible paths
 
 *Note: Times may vary based on hardware and system load. These measurements were taken on the same machine running Windows with .NET 10.0.100, Python 3.x, and Rust (latest stable).*
 

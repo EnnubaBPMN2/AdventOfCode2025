@@ -10,7 +10,14 @@
       "Bash(cargo build:*)",
       "Bash($env:PYTHONIOENCODING=\"utf-8\")",
       "Bash(set:*)",
-      "Bash(cargo run:*)"
+      "Bash(cargo run:*)",
+      "Bash(timeout 30 dotnet run:*)",
+      "Bash(timeout 10 dotnet run:*)",
+      "Bash(timeout 5 dotnet run:*)",
+      "Bash(timeout 60 dotnet run:*)",
+      "Bash(timeout 120 dotnet run:*)",
+      "Bash(cat:*)",
+      "Bash(timeout 60 bash:*)"
     ],
     "deny": [],
     "ask": []
