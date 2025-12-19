@@ -17,7 +17,8 @@
       "Bash(timeout 60 dotnet run:*)",
       "Bash(timeout 120 dotnet run:*)",
       "Bash(cat:*)",
-      "Bash(timeout 60 bash:*)"
+      "Bash(timeout 60 bash:*)",
+      "Bash(rm:*)"
     ],
     "deny": [],
     "ask": []
