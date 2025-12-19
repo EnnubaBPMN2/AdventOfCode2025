@@ -12,9 +12,15 @@ pub fn run() {
 pub fn part1(input: &str) -> i64 {
     let (shapes, regions) = parse_input(input);
 
+    // Precompute all shape orientations once
+    let all_orientations: Vec<Vec<Shape>> = shapes
+        .iter()
+        .map(|s| get_all_orientations(s))
+        .collect();
+
     let mut count = 0;
     for region in &regions {
-        if can_fit_all_presents(region, &shapes) {
+        if can_fit_all_presents(region, &all_orientations) {
             count += 1;
         }
     }
@@ -27,6 +33,43 @@ struct Region {
     width: usize,
     height: usize,
     counts: Vec<usize>,
+}
+
+#[derive(Debug, Clone)]
+struct Shape {
+    rows: Vec<usize>,
+    cols: Vec<usize>,
+    width: usize,
+    height: usize,
+    area: usize,
+}
+
+impl Shape {
+    fn from_strings(lines: &[String]) -> Self {
+        let mut rows = Vec::new();
+        let mut cols = Vec::new();
+
+        for (r, line) in lines.iter().enumerate() {
+            for (c, ch) in line.chars().enumerate() {
+                if ch == '#' {
+                    rows.push(r);
+                    cols.push(c);
+                }
+            }
+        }
+
+        let height = lines.len();
+        let width = lines.iter().map(|l| l.len()).max().unwrap_or(0);
+        let area = rows.len();
+
+        Shape {
+            rows,
+            cols,
+            width,
+            height,
+            area,
+        }
+    }
 }
 
 fn parse_input(input: &str) -> (Vec<Vec<String>>, Vec<Region>) {
@@ -76,14 +119,14 @@ fn parse_input(input: &str) -> (Vec<Vec<String>>, Vec<Region>) {
     (shapes, regions)
 }
 
-fn can_fit_all_presents(region: &Region, shape_templates: &[Vec<String>]) -> bool {
-    // Quick area check - if total shape area exceeds grid area, impossible
+fn can_fit_all_presents(region: &Region, all_orientations: &[Vec<Shape>]) -> bool {
+    // Quick area check
     let total_area = region.width * region.height;
     let mut required_area = 0;
 
     for (i, &count) in region.counts.iter().enumerate() {
         if count > 0 {
-            let shape_area = get_shape_area(&shape_templates[i]);
+            let shape_area = all_orientations[i][0].area;
             required_area += shape_area * count;
         }
     }
@@ -92,87 +135,111 @@ fn can_fit_all_presents(region: &Region, shape_templates: &[Vec<String>]) -> boo
         return false;
     }
 
-    // Initialize grid
-    let mut grid = vec![vec!['.'; region.width]; region.height];
+    // Use flat 1D array for better cache performance
+    let mut grid = vec![false; region.width * region.height];
+    let mut counts = region.counts.clone();
 
-    // Build list of presents to place
-    let mut presents = Vec::new();
-    for (i, &count) in region.counts.iter().enumerate() {
-        if count > 0 {
-            presents.push((i, count));
-        }
-    }
-
-    // Try to place all presents
-    let mut call_count = 0;
-    try_place_presents(&mut grid, &presents, shape_templates, b'A', &mut call_count)
-}
-
-fn get_shape_area(shape: &[String]) -> usize {
-    let mut area = 0;
-    for row in shape {
-        area += row.chars().filter(|&c| c == '#').count();
-    }
-    area
+    try_place_presents(&mut grid, region.width, region.height, &mut counts, all_orientations, 0)
 }
 
 fn try_place_presents(
-    grid: &mut Vec<Vec<char>>,
-    presents: &[(usize, usize)],
-    shape_templates: &[Vec<String>],
-    label: u8,
-    call_count: &mut i32,
+    grid: &mut [bool],
+    width: usize,
+    height: usize,
+    counts: &mut [usize],
+    all_orientations: &[Vec<Shape>],
+    call_count: i32,
 ) -> bool {
-    *call_count += 1;
-    if *call_count > 2_000_000 {
-        return false; // Fail faster on impossible regions
-    }
-
-    // Check if all presents are placed
-    if presents.iter().all(|(_, count)| *count == 0) {
-        return true;
-    }
-
-    // Try placing first available present type
-    for i in 0..presents.len() {
-        let (shape_index, count) = presents[i];
-        if count == 0 {
-            continue;
-        }
-
-        let shapes = get_all_orientations(&shape_templates[shape_index]);
-
-        for shape in &shapes {
-            // Try placing at every position
-            for row in 0..grid.len() {
-                for col in 0..grid[0].len() {
-                    if can_place_shape(grid, shape, row, col) {
-                        place_shape(grid, shape, row, col, label as char);
-
-                        // Create new presents list with one less of this shape
-                        let mut new_presents = presents.to_vec();
-                        new_presents[i] = (shape_index, count - 1);
-
-                        if try_place_presents(grid, &new_presents, shape_templates, label.wrapping_add(1), call_count) {
-                            return true;
-                        }
-
-                        remove_shape(grid, shape, row, col);
-                    }
-                }
-            }
-        }
-
-        // If we couldn't place this present type anywhere, fail
+    if call_count > 2_000_000 {
         return false;
     }
 
-    true // All presents placed
+    // Find first empty cell
+    let start_idx = match grid.iter().position(|&cell| !cell) {
+        Some(idx) => idx,
+        None => return true, // All cells filled - success!
+    };
+
+    let start_row = start_idx / width;
+    let start_col = start_idx % width;
+
+    // Try each shape type
+    for shape_idx in 0..counts.len() {
+        if counts[shape_idx] == 0 {
+            continue;
+        }
+
+        let orientations = &all_orientations[shape_idx];
+
+        // Try each orientation
+        for shape in orientations {
+            // Can we place this shape at the first empty position?
+            if can_place_shape(grid, width, height, shape, start_row, start_col) {
+                place_shape(grid, width, shape, start_row, start_col);
+                counts[shape_idx] -= 1;
+
+                if try_place_presents(grid, width, height, counts, all_orientations, call_count + 1) {
+                    return true;
+                }
+
+                remove_shape(grid, width, shape, start_row, start_col);
+                counts[shape_idx] += 1;
+            }
+        }
+    }
+
+    false
 }
 
-fn get_all_orientations(shape: &[String]) -> Vec<Vec<String>> {
+fn can_place_shape(
+    grid: &[bool],
+    width: usize,
+    height: usize,
+    shape: &Shape,
+    start_row: usize,
+    start_col: usize,
+) -> bool {
+    if start_row + shape.height > height {
+        return false;
+    }
+    if start_col + shape.width > width {
+        return false;
+    }
+
+    for i in 0..shape.rows.len() {
+        let r = shape.rows[i];
+        let c = shape.cols[i];
+        let grid_idx = (start_row + r) * width + (start_col + c);
+
+        if grid[grid_idx] {
+            return false;
+        }
+    }
+
+    true
+}
+
+fn place_shape(grid: &mut [bool], width: usize, shape: &Shape, start_row: usize, start_col: usize) {
+    for i in 0..shape.rows.len() {
+        let r = shape.rows[i];
+        let c = shape.cols[i];
+        let grid_idx = (start_row + r) * width + (start_col + c);
+        grid[grid_idx] = true;
+    }
+}
+
+fn remove_shape(grid: &mut [bool], width: usize, shape: &Shape, start_row: usize, start_col: usize) {
+    for i in 0..shape.rows.len() {
+        let r = shape.rows[i];
+        let c = shape.cols[i];
+        let grid_idx = (start_row + r) * width + (start_col + c);
+        grid[grid_idx] = false;
+    }
+}
+
+fn get_all_orientations(shape_template: &[String]) -> Vec<Shape> {
     let mut orientations = HashSet::new();
-    let mut current = shape.to_vec();
+    let mut current = shape_template.to_vec();
 
     for _ in 0..4 {
         orientations.insert(current.join("|"));
@@ -186,7 +253,10 @@ fn get_all_orientations(shape: &[String]) -> Vec<Vec<String>> {
 
     orientations
         .into_iter()
-        .map(|s| s.split('|').map(|part| part.to_string()).collect())
+        .map(|s| {
+            let lines: Vec<String> = s.split('|').map(|part| part.to_string()).collect();
+            Shape::from_strings(&lines)
+        })
         .collect()
 }
 
@@ -208,55 +278,4 @@ fn rotate(shape: &[String]) -> Vec<String> {
 
 fn flip(shape: &[String]) -> Vec<String> {
     shape.iter().map(|row| row.chars().rev().collect()).collect()
-}
-
-fn can_place_shape(grid: &[Vec<char>], shape: &[String], start_row: usize, start_col: usize) -> bool {
-    let grid_rows = grid.len();
-    let grid_cols = grid[0].len();
-
-    // Check if the shape fits within grid bounds
-    if start_row + shape.len() > grid_rows {
-        return false;
-    }
-
-    let max_shape_width = shape.iter().map(|row| row.len()).max().unwrap_or(0);
-    if start_col + max_shape_width > grid_cols {
-        return false;
-    }
-
-    for (r, row) in shape.iter().enumerate() {
-        for (c, cell) in row.chars().enumerate() {
-            if cell == '#' {
-                let grid_row = start_row + r;
-                let grid_col = start_col + c;
-
-                // Only check '#' cells - '.' cells in the shape can overlap anything
-                if grid[grid_row][grid_col] != '.' {
-                    return false;
-                }
-            }
-        }
-    }
-
-    true
-}
-
-fn place_shape(grid: &mut Vec<Vec<char>>, shape: &[String], start_row: usize, start_col: usize, label: char) {
-    for (r, row) in shape.iter().enumerate() {
-        for (c, cell) in row.chars().enumerate() {
-            if cell == '#' {
-                grid[start_row + r][start_col + c] = label;
-            }
-        }
-    }
-}
-
-fn remove_shape(grid: &mut Vec<Vec<char>>, shape: &[String], start_row: usize, start_col: usize) {
-    for (r, row) in shape.iter().enumerate() {
-        for (c, cell) in row.chars().enumerate() {
-            if cell == '#' {
-                grid[start_row + r][start_col + c] = '.';
-            }
-        }
-    }
 }

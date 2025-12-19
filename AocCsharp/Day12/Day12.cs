@@ -17,10 +17,17 @@ public static class Day12
     {
         var (shapes, regions) = ParseInput(input);
 
+        // Precompute all shape orientations once
+        var allOrientations = new Shape[shapes.Count][];
+        for (int i = 0; i < shapes.Count; i++)
+        {
+            allOrientations[i] = GetAllOrientations(shapes[i]);
+        }
+
         int count = 0;
         foreach (var region in regions)
         {
-            if (CanFitAllPresents(region, shapes))
+            if (CanFitAllPresents(region, allOrientations))
             {
                 count++;
             }
@@ -80,11 +87,9 @@ public static class Day12
         return (shapes, regions);
     }
 
-    private static int _callCount = 0;
-
-    private static bool CanFitAllPresents(Region region, List<List<string>> shapeTemplates)
+    private static bool CanFitAllPresents(Region region, Shape[][] allOrientations)
     {
-        // Quick area check - if total shape area exceeds grid area, impossible
+        // Quick area check
         int totalArea = region.Width * region.Height;
         int requiredArea = 0;
 
@@ -92,123 +97,134 @@ public static class Day12
         {
             if (region.Counts[i] > 0)
             {
-                int shapeArea = GetShapeArea(shapeTemplates[i]);
+                int shapeArea = allOrientations[i][0].Area;
                 requiredArea += shapeArea * region.Counts[i];
             }
         }
 
-        // If we need more area than available, it's impossible
         if (requiredArea > totalArea)
         {
             return false;
         }
 
-        var grid = new char[region.Height, region.Width];
-        for (int r = 0; r < region.Height; r++)
-            for (int c = 0; c < region.Width; c++)
-                grid[r, c] = '.';
+        var grid = new bool[region.Height * region.Width];
+        var counts = (int[])region.Counts.Clone();
 
-        var presents = new List<(int shapeIndex, int count)>();
-        for (int i = 0; i < region.Counts.Length; i++)
-        {
-            if (region.Counts[i] > 0)
-            {
-                presents.Add((i, region.Counts[i]));
-            }
-        }
-
-        _callCount = 0;
-        var result = TryPlacePresents(grid, presents, 0, shapeTemplates, 'A');
-
-        return result;
+        return TryPlacePresents(grid, region.Width, region.Height, counts, allOrientations, 0);
     }
 
-    private static int GetShapeArea(List<string> shape)
+    private static bool TryPlacePresents(bool[] grid, int width, int height, int[] counts,
+        Shape[][] allOrientations, int callCount)
     {
-        int area = 0;
-        foreach (var row in shape)
-        {
-            area += row.Count(c => c == '#');
-        }
-        return area;
-    }
+        if (callCount > 2000000) return false;
 
-    private static bool TryPlacePresents(char[,] grid, List<(int shapeIndex, int count)> presents,
-        int presentIndex, List<List<string>> shapeTemplates, char label)
-    {
-        _callCount++;
-        if (_callCount > 2000000) return false; // Fail faster on impossible regions
-
-        // Check if all presents are placed
-        bool allPlaced = true;
-        for (int i = 0; i < presents.Count; i++)
+        // Find first empty cell
+        int startIdx = -1;
+        for (int i = 0; i < grid.Length; i++)
         {
-            if (presents[i].count > 0)
+            if (!grid[i])
             {
-                allPlaced = false;
+                startIdx = i;
                 break;
             }
         }
-        if (allPlaced) return true;
 
-        // Try placing first available present type
-        for (int i = 0; i < presents.Count; i++)
+        // All cells filled - success!
+        if (startIdx == -1) return true;
+
+        int startRow = startIdx / width;
+        int startCol = startIdx % width;
+
+        // Try each shape type
+        for (int shapeIdx = 0; shapeIdx < counts.Length; shapeIdx++)
         {
-            if (presents[i].count == 0) continue;
+            if (counts[shapeIdx] == 0) continue;
 
-            var (shapeIndex, count) = presents[i];
-            var shapes = GetAllOrientations(shapeTemplates[shapeIndex]);
+            var orientations = allOrientations[shapeIdx];
 
-            foreach (var shape in shapes)
+            // Try each orientation
+            foreach (var shape in orientations)
             {
-                // Try placing at every position
-                for (int row = 0; row < grid.GetLength(0); row++)
+                // Can we place this shape at the first empty position?
+                if (CanPlaceShape(grid, width, height, shape, startRow, startCol))
                 {
-                    for (int col = 0; col < grid.GetLength(1); col++)
+                    PlaceShape(grid, width, shape, startRow, startCol);
+                    counts[shapeIdx]--;
+
+                    if (TryPlacePresents(grid, width, height, counts, allOrientations, callCount + 1))
                     {
-                        if (CanPlaceShape(grid, shape, row, col))
-                        {
-                            PlaceShape(grid, shape, row, col, label);
-
-                            // Create new presents list with one less of this shape
-                            var newPresents = new List<(int shapeIndex, int count)>(presents);
-                            newPresents[i] = (shapeIndex, count - 1);
-
-                            if (TryPlacePresents(grid, newPresents, 0, shapeTemplates, (char)(label + 1)))
-                            {
-                                return true;
-                            }
-
-                            RemoveShape(grid, shape, row, col);
-                        }
+                        return true;
                     }
+
+                    RemoveShape(grid, width, shape, startRow, startCol);
+                    counts[shapeIdx]++;
                 }
             }
-
-            // If we couldn't place this present type anywhere, fail
-            return false;
         }
 
-        return true; // All presents placed
+        return false;
     }
 
-    private static List<List<string>> GetAllOrientations(List<string> shape)
+    private static bool CanPlaceShape(bool[] grid, int width, int height, Shape shape, int startRow, int startCol)
+    {
+        if (startRow + shape.Height > height) return false;
+        if (startCol + shape.Width > width) return false;
+
+        for (int i = 0; i < shape.CellCount; i++)
+        {
+            int r = shape.Rows[i];
+            int c = shape.Cols[i];
+            int gridIdx = (startRow + r) * width + (startCol + c);
+
+            if (grid[gridIdx])
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static void PlaceShape(bool[] grid, int width, Shape shape, int startRow, int startCol)
+    {
+        for (int i = 0; i < shape.CellCount; i++)
+        {
+            int r = shape.Rows[i];
+            int c = shape.Cols[i];
+            int gridIdx = (startRow + r) * width + (startCol + c);
+            grid[gridIdx] = true;
+        }
+    }
+
+    private static void RemoveShape(bool[] grid, int width, Shape shape, int startRow, int startCol)
+    {
+        for (int i = 0; i < shape.CellCount; i++)
+        {
+            int r = shape.Rows[i];
+            int c = shape.Cols[i];
+            int gridIdx = (startRow + r) * width + (startCol + c);
+            grid[gridIdx] = false;
+        }
+    }
+
+    private static Shape[] GetAllOrientations(List<string> shapeTemplate)
     {
         var orientations = new HashSet<string>();
-        var current = shape;
+        var current = shapeTemplate;
 
         for (int rotation = 0; rotation < 4; rotation++)
         {
-            orientations.Add(string.Join("|", current));
+            var key = string.Join("|", current);
+            orientations.Add(key);
 
-            // Also add flipped version
             var flipped = Flip(current);
-            orientations.Add(string.Join("|", flipped));
+            var flippedKey = string.Join("|", flipped);
+            orientations.Add(flippedKey);
 
             current = Rotate(current);
         }
 
-        return orientations.Select(s => s.Split('|').ToList()).ToList();
+        return orientations.Select(s => new Shape(s.Split('|'))).ToArray();
     }
 
     private static List<string> Rotate(List<string> shape)
@@ -235,63 +251,45 @@ public static class Day12
         return shape.Select(row => new string(row.Reverse().ToArray())).ToList();
     }
 
-    private static bool CanPlaceShape(char[,] grid, List<string> shape, int startRow, int startCol)
+    private record Region(int Width, int Height, int[] Counts);
+
+    private class Shape
     {
-        int gridRows = grid.GetLength(0);
-        int gridCols = grid.GetLength(1);
+        public int[] Rows;
+        public int[] Cols;
+        public int CellCount;
+        public int Width;
+        public int Height;
+        public int Area;
 
-        // Check if the shape fits within grid bounds
-        if (startRow + shape.Count > gridRows) return false;
-        if (startCol + shape.Max(row => row.Length) > gridCols) return false;
-
-        for (int r = 0; r < shape.Count; r++)
+        public Shape(string[] lines)
         {
-            for (int c = 0; c < shape[r].Length; c++)
-            {
-                if (shape[r][c] == '#')
-                {
-                    int gridRow = startRow + r;
-                    int gridCol = startCol + c;
+            var cells = new List<(int row, int col)>();
 
-                    // Only check '#' cells - '.' cells in the shape can overlap anything
-                    if (grid[gridRow, gridCol] != '.')
+            for (int r = 0; r < lines.Length; r++)
+            {
+                for (int c = 0; c < lines[r].Length; c++)
+                {
+                    if (lines[r][c] == '#')
                     {
-                        return false;
+                        cells.Add((r, c));
                     }
                 }
             }
-        }
 
-        return true;
-    }
+            CellCount = cells.Count;
+            Rows = new int[CellCount];
+            Cols = new int[CellCount];
 
-    private static void PlaceShape(char[,] grid, List<string> shape, int startRow, int startCol, char label)
-    {
-        for (int r = 0; r < shape.Count; r++)
-        {
-            for (int c = 0; c < shape[r].Length; c++)
+            for (int i = 0; i < CellCount; i++)
             {
-                if (shape[r][c] == '#')
-                {
-                    grid[startRow + r, startCol + c] = label;
-                }
+                Rows[i] = cells[i].row;
+                Cols[i] = cells[i].col;
             }
+
+            Height = lines.Length;
+            Width = lines.Max(l => l.Length);
+            Area = CellCount;
         }
     }
-
-    private static void RemoveShape(char[,] grid, List<string> shape, int startRow, int startCol)
-    {
-        for (int r = 0; r < shape.Count; r++)
-        {
-            for (int c = 0; c < shape[r].Length; c++)
-            {
-                if (shape[r][c] == '#')
-                {
-                    grid[startRow + r, startCol + c] = '.';
-                }
-            }
-        }
-    }
-
-    private record Region(int Width, int Height, int[] Counts);
 }
