@@ -118,51 +118,54 @@ public static class Day12
     {
         if (callCount > 2000000) return false;
 
-        // Find first empty cell
-        int startIdx = -1;
-        for (int i = 0; i < grid.Length; i++)
+        // Check if all presents are placed
+        bool allPlaced = true;
+        for (int i = 0; i < counts.Length; i++)
         {
-            if (!grid[i])
+            if (counts[i] > 0)
             {
-                startIdx = i;
+                allPlaced = false;
                 break;
             }
         }
+        if (allPlaced) return true;
 
-        // All cells filled - success!
-        if (startIdx == -1) return true;
-
-        int startRow = startIdx / width;
-        int startCol = startIdx % width;
-
-        // Try each shape type
+        // Try placing first available present type
         for (int shapeIdx = 0; shapeIdx < counts.Length; shapeIdx++)
         {
             if (counts[shapeIdx] == 0) continue;
 
             var orientations = allOrientations[shapeIdx];
 
-            // Try each orientation
+            // Try each orientation at each position
             foreach (var shape in orientations)
             {
-                // Can we place this shape at the first empty position?
-                if (CanPlaceShape(grid, width, height, shape, startRow, startCol))
+                for (int row = 0; row <= height - shape.Height; row++)
                 {
-                    PlaceShape(grid, width, shape, startRow, startCol);
-                    counts[shapeIdx]--;
-
-                    if (TryPlacePresents(grid, width, height, counts, allOrientations, callCount + 1))
+                    for (int col = 0; col <= width - shape.Width; col++)
                     {
-                        return true;
-                    }
+                        if (CanPlaceShape(grid, width, height, shape, row, col))
+                        {
+                            PlaceShape(grid, width, shape, row, col);
+                            counts[shapeIdx]--;
 
-                    RemoveShape(grid, width, shape, startRow, startCol);
-                    counts[shapeIdx]++;
+                            if (TryPlacePresents(grid, width, height, counts, allOrientations, callCount + 1))
+                            {
+                                return true;
+                            }
+
+                            RemoveShape(grid, width, shape, row, col);
+                            counts[shapeIdx]++;
+                        }
+                    }
                 }
             }
+
+            // If we couldn't place this present type anywhere, fail
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     private static bool CanPlaceShape(bool[] grid, int width, int height, Shape shape, int startRow, int startCol)

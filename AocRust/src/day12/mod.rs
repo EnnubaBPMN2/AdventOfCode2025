@@ -154,16 +154,12 @@ fn try_place_presents(
         return false;
     }
 
-    // Find first empty cell
-    let start_idx = match grid.iter().position(|&cell| !cell) {
-        Some(idx) => idx,
-        None => return true, // All cells filled - success!
-    };
+    // Check if all presents are placed
+    if counts.iter().all(|&count| count == 0) {
+        return true;
+    }
 
-    let start_row = start_idx / width;
-    let start_col = start_idx % width;
-
-    // Try each shape type
+    // Try placing first available present type
     for shape_idx in 0..counts.len() {
         if counts[shape_idx] == 0 {
             continue;
@@ -171,24 +167,30 @@ fn try_place_presents(
 
         let orientations = &all_orientations[shape_idx];
 
-        // Try each orientation
+        // Try each orientation at each position
         for shape in orientations {
-            // Can we place this shape at the first empty position?
-            if can_place_shape(grid, width, height, shape, start_row, start_col) {
-                place_shape(grid, width, shape, start_row, start_col);
-                counts[shape_idx] -= 1;
+            for row in 0..=(height.saturating_sub(shape.height)) {
+                for col in 0..=(width.saturating_sub(shape.width)) {
+                    if can_place_shape(grid, width, height, shape, row, col) {
+                        place_shape(grid, width, shape, row, col);
+                        counts[shape_idx] -= 1;
 
-                if try_place_presents(grid, width, height, counts, all_orientations, call_count + 1) {
-                    return true;
+                        if try_place_presents(grid, width, height, counts, all_orientations, call_count + 1) {
+                            return true;
+                        }
+
+                        remove_shape(grid, width, shape, row, col);
+                        counts[shape_idx] += 1;
+                    }
                 }
-
-                remove_shape(grid, width, shape, start_row, start_col);
-                counts[shape_idx] += 1;
             }
         }
+
+        // If we couldn't place this present type anywhere, fail
+        return false;
     }
 
-    false
+    true
 }
 
 fn can_place_shape(
