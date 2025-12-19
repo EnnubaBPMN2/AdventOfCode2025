@@ -105,12 +105,16 @@ def try_place_presents(grid, width, height, counts, all_orientations, call_count
     if call_count[0] > 2000000:
         return False
 
+    # Check if all presents are placed
+    if all(count == 0 for count in counts):
+        return True
+
     # Find first empty cell (smart placement strategy)
     try:
         start_idx = grid.index(False)
     except ValueError:
-        # No empty cells left - success!
-        return True
+        # No empty cell but presents remain - impossible
+        return False
 
     start_row = start_idx // width
     start_col = start_idx % width

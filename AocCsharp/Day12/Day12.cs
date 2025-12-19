@@ -118,6 +118,18 @@ public static class Day12
     {
         if (callCount > 2000000) return false;
 
+        // Check if all presents are placed
+        bool allPlaced = true;
+        for (int i = 0; i < counts.Length; i++)
+        {
+            if (counts[i] > 0)
+            {
+                allPlaced = false;
+                break;
+            }
+        }
+        if (allPlaced) return true;
+
         // Find first empty cell
         int startIdx = -1;
         for (int i = 0; i < grid.Length; i++)
@@ -129,8 +141,8 @@ public static class Day12
             }
         }
 
-        // All cells filled - success!
-        if (startIdx == -1) return true;
+        // No empty cell but presents remain - impossible
+        if (startIdx == -1) return false;
 
         int startRow = startIdx / width;
         int startCol = startIdx % width;

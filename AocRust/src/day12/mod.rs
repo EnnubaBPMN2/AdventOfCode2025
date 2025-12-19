@@ -154,10 +154,15 @@ fn try_place_presents(
         return false;
     }
 
+    // Check if all presents are placed
+    if counts.iter().all(|&count| count == 0) {
+        return true;
+    }
+
     // Find first empty cell
     let start_idx = match grid.iter().position(|&cell| !cell) {
         Some(idx) => idx,
-        None => return true, // All cells filled - success!
+        None => return false, // No empty cell but presents remain - impossible
     };
 
     let start_row = start_idx / width;
