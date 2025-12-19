@@ -4,22 +4,22 @@ from utils.input_reader import run_solution
 
 class Shape:
     """Optimized shape representation with precomputed cell positions."""
-    __slots__ = ('rows', 'cols', 'width', 'height', 'area')
+    __slots__ = ('cells', 'width', 'height', 'area', 'cell_count')
 
     def __init__(self, shape_lines):
         """Parse shape and precompute all necessary data."""
-        self.rows = []
-        self.cols = []
-
+        # Store as tuple of tuples for immutability and speed
+        cells = []
         for r, line in enumerate(shape_lines):
             for c, cell in enumerate(line):
                 if cell == '#':
-                    self.rows.append(r)
-                    self.cols.append(c)
+                    cells.append((r, c))
 
+        self.cells = tuple(cells)  # Immutable tuple is faster
+        self.cell_count = len(cells)
         self.height = len(shape_lines)
         self.width = max(len(line) for line in shape_lines) if shape_lines else 0
-        self.area = len(self.rows)
+        self.area = self.cell_count
 
 
 def part1(input_text: str) -> int:
@@ -30,7 +30,7 @@ def part1(input_text: str) -> int:
     shapes, regions = parse_input(input_text)
 
     # Precompute all shape orientations once
-    all_orientations = [get_all_orientations(shape) for shape in shapes]
+    all_orientations = tuple(tuple(get_all_orientations(shape)) for shape in shapes)
 
     count = 0
     for region in regions:
@@ -57,7 +57,7 @@ def parse_input(input_text: str):
             width = int(dimensions[0])
             height = int(dimensions[1])
 
-            counts = list(map(int, parts[1].strip().split()))
+            counts = tuple(map(int, parts[1].strip().split()))
             regions.append((width, height, counts))
             i += 1
         # Parse shape
@@ -91,86 +91,78 @@ def can_fit_all_presents(region, all_orientations):
     if required_area > total_area:
         return False
 
-    # Use flat 1D list for better performance
-    grid = [False] * (width * height)
-    counts_mutable = list(counts)
+    # Use bytearray for grid - much faster than list for boolean operations
+    grid = bytearray(width * height)
+    counts_list = list(counts)
 
-    call_count = [0]
-    return try_place_presents(grid, width, height, counts_mutable, all_orientations, call_count)
+    return try_place_presents(grid, width, height, counts_list, all_orientations, 0)
 
 
 def try_place_presents(grid, width, height, counts, all_orientations, call_count):
     """Recursively try to place all presents using backtracking."""
-    call_count[0] += 1
-    if call_count[0] > 2000000:
+    if call_count > 2000000:
         return False
 
-    # Check if all presents are placed
-    if all(count == 0 for count in counts):
-        return True
+    # Check if all presents are placed - cache len for speed
+    counts_len = len(counts)
+    for i in range(counts_len):
+        if counts[i] > 0:
+            break
+    else:
+        return True  # All counts are 0
 
     # Try placing first available present type
-    for shape_idx in range(len(counts)):
-        if counts[shape_idx] == 0:
+    for shape_idx in range(counts_len):
+        count = counts[shape_idx]
+        if count == 0:
             continue
 
         orientations = all_orientations[shape_idx]
 
         # Try each orientation at each position
         for shape in orientations:
-            for row in range(max(0, height - shape.height + 1)):
-                for col in range(max(0, width - shape.width + 1)):
-                    if can_place_shape(grid, width, height, shape, row, col):
-                        place_shape(grid, width, shape, row, col)
+            # Cache shape attributes to avoid repeated lookups
+            shape_height = shape.height
+            shape_width = shape.width
+            shape_cells = shape.cells
+            shape_cell_count = shape.cell_count
+
+            max_row = height - shape_height
+            max_col = width - shape_width
+
+            for row in range(max_row + 1):
+                for col in range(max_col + 1):
+                    # Inline can_place_shape for speed
+                    can_place = True
+                    for i in range(shape_cell_count):
+                        r, c = shape_cells[i]
+                        grid_idx = (row + r) * width + (col + c)
+                        if grid[grid_idx]:
+                            can_place = False
+                            break
+
+                    if can_place:
+                        # Place shape
+                        for i in range(shape_cell_count):
+                            r, c = shape_cells[i]
+                            grid[(row + r) * width + (col + c)] = 1
+
                         counts[shape_idx] -= 1
 
-                        if try_place_presents(grid, width, height, counts, all_orientations, call_count):
+                        if try_place_presents(grid, width, height, counts, all_orientations, call_count + 1):
                             return True
 
-                        # Backtrack
-                        remove_shape(grid, width, shape, row, col)
+                        # Backtrack - remove shape
+                        for i in range(shape_cell_count):
+                            r, c = shape_cells[i]
+                            grid[(row + r) * width + (col + c)] = 0
+
                         counts[shape_idx] += 1
 
         # If we couldn't place this present type anywhere, fail
         return False
 
     return True
-
-
-def can_place_shape(grid, width, height, shape, start_row, start_col):
-    """Check if a shape can be placed at the given position."""
-    if start_row + shape.height > height:
-        return False
-    if start_col + shape.width > width:
-        return False
-
-    for i in range(len(shape.rows)):
-        r = shape.rows[i]
-        c = shape.cols[i]
-        grid_idx = (start_row + r) * width + (start_col + c)
-
-        if grid[grid_idx]:
-            return False
-
-    return True
-
-
-def place_shape(grid, width, shape, start_row, start_col):
-    """Place a shape on the grid."""
-    for i in range(len(shape.rows)):
-        r = shape.rows[i]
-        c = shape.cols[i]
-        grid_idx = (start_row + r) * width + (start_col + c)
-        grid[grid_idx] = True
-
-
-def remove_shape(grid, width, shape, start_row, start_col):
-    """Remove a shape from the grid."""
-    for i in range(len(shape.rows)):
-        r = shape.rows[i]
-        c = shape.cols[i]
-        grid_idx = (start_row + r) * width + (start_col + c)
-        grid[grid_idx] = False
 
 
 def get_all_orientations(shape_template):
@@ -198,9 +190,7 @@ def rotate(shape):
     rotated = []
 
     for c in range(cols):
-        new_row = ''
-        for r in range(rows):
-            new_row += shape[rows - 1 - r][c]
+        new_row = ''.join(shape[rows - 1 - r][c] for r in range(rows))
         rotated.append(new_row)
 
     return rotated
