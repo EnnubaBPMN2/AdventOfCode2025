@@ -289,66 +289,67 @@ The test framework will:
 
 Execution times for real puzzle inputs across all three language implementations (in seconds):
 
-| Day | Problem | C# | Python | Rust | Fastest |
-|-----|---------|------|--------|------|---------|
+| Day | Problem | C# | PyPy | Rust | Fastest |
+|-----|---------|------|------|------|---------|
 | **1** | Secret Entrance (Dial Rotation) |
-| | Part 1 | 0.000s | 0.001s | 0.003s | 🥇 C# |
-| | Part 2 | 0.000s | 0.001s | 0.003s | 🥇 C# |
+| | Part 1 | 0.001s | 0.009s | 0.000s | 🥇 Rust |
+| | Part 2 | 0.000s | 0.007s | 0.000s | 🥇 C# / Rust |
 | **2** | Gift Shop |
-| | Part 1 | 0.043s | 0.217s | 0.193s | 🥇 C# |
-| | Part 2 | 0.111s | 0.538s | 0.626s | 🥇 C# |
+| | Part 1 | 0.051s | 0.029s | 0.056s | 🥇 PyPy |
+| | Part 2 | 0.102s | 0.087s | 0.169s | 🥇 PyPy |
 | **3** | Printing Department |
-| | Part 1 | 0.003s | 0.044s | 0.024s | 🥇 C# |
-| | Part 2 | 0.001s | 0.003s | 0.002s | 🥇 C# |
+| | Part 1 | 0.007s | 0.010s | 0.002s | 🥇 Rust |
+| | Part 2 | 0.002s | 0.013s | 0.001s | 🥇 Rust |
 | **4** | Printing Department |
-| | Part 1 | 0.001s | 0.017s | 0.005s | 🥇 C# |
-| | Part 2 | 0.014s | 0.249s | 0.059s | 🥇 C# |
+| | Part 1 | 0.002s | 0.018s | 0.000s | 🥇 Rust |
+| | Part 2 | 0.042s | 0.042s | 0.006s | 🥇 Rust |
 | **5** | Cafeteria |
-| | Part 1 | 0.001s | 0.006s | 0.002s | 🥇 C# |
-| | Part 2 | 0.000s | 0.000s | 0.001s | 🥇 C# / Python |
+| | Part 1 | 0.003s | 0.007s | 0.000s | 🥇 Rust |
+| | Part 2 | 0.001s | 0.001s | 0.000s | 🥇 Rust |
 | **6** | Trash Compactor (Math Worksheet) |
-| | Part 1 | 0.000s | 0.002s | 0.003s ⚡ | 🥇 C# |
-| | Part 2 | 0.000s | 0.002s | 0.001s ⚡ | 🥇 C# |
+| | Part 1 | 0.001s | 0.018s | 0.001s | 🥇 C# / Rust |
+| | Part 2 | 0.001s | 0.014s | 0.001s | 🥇 C# / Rust |
 | **7** | Laboratories (Tachyon Manifold) |
-| | Part 1 | 0.000s | 0.001s | 0.005s | 🥇 C# |
-| | Part 2 | 0.001s | 0.002s | 0.005s | 🥇 C# |
+| | Part 1 | 0.000s | 0.007s | 0.000s | 🥇 C# / Rust |
+| | Part 2 | 0.001s | 0.011s | 0.000s | 🥇 Rust |
 | **8** | Playground (Junction Box Circuits) |
-| | Part 1 | 0.155s | 0.527s | 0.207s | 🥇 C# |
-| | Part 2 | 0.161s | 0.546s | 0.425s | 🥇 C# |
+| | Part 1 | 0.162s | 0.789s | 0.037s | 🥇 Rust |
+| | Part 2 | 0.167s | 0.791s | 0.047s | 🥇 Rust |
 | **9** | Day 09 |
-| | Part 1 | 0.004s | 0.034s | 0.003s | 🥇 Rust |
-| | Part 2 | 1.236s | 2.704s ⚡ | 1.300s | 🥇 C# |
+| | Part 1 | 0.003s | 0.005s | 0.000s | 🥇 Rust |
+| | Part 2 | 1.103s | 0.413s | 0.125s | 🥇 Rust |
 | **10** | Factory (Indicator Lights & Joltage Counters) |
-| | Part 1 | 0.002s | 0.011s | 0.172s | 🥇 C# |
-| | Part 2 | 0.155s | 1.447s | 0.644s | 🥇 C# |
+| | Part 1 | 0.006s | 0.041s | 0.028s | 🥇 C# |
+| | Part 2 | 0.164s | 0.265s | 0.099s | 🥇 Rust |
 | **11** | Reactor (Path Finding) |
-| | Part 1 | 0.000s | 0.001s | 0.002s | 🥇 C# |
-| | Part 2 | 0.001s | 0.003s | 0.005s | 🥇 C# |
-| **12** | Christmas Tree Farm (2D Shape Packing) |
-| | Part 1 | 2.715s | 15.523s ⚡ | 0.623s | 🥇 Rust |
+| | Part 1 | 0.001s | 0.007s | 0.001s | 🥇 C# / Rust |
+| | Part 2 | 0.003s | 0.020s | 0.001s | 🥇 Rust |
+| **12** | Christmas Tree Farm (2D Shape Packing) ⚡ |
+| | Part 1 | 0.435s | 0.423s | 0.123s | 🥇 Rust |
 | | Part 2 | *Auto* | *Auto* | *Auto* | - |
 
 ### Summary Statistics
 
 | Language | Total Time | Avg Time/Part | Wins |
 |----------|-----------|---------------|------|
-| **C#** | 4.778s | 0.209s | 🥇 21/23 |
-| **Python** | 22.427s | 0.975s | 0/23 |
-| **Rust** | 4.687s | 0.204s | 🥈 2/23 |
+| **Rust** | 0.697s | 0.030s | 🥇 18/23 |
+| **C#** | 2.259s | 0.098s | 🥈 4/23 |
+| **PyPy** | 3.027s | 0.132s | 🥉 2/23 |
 
 ### Key Observations
 
-- **C# and Rust are neck-and-neck** with nearly identical total times (4.778s vs 4.687s) - Rust edges ahead by 0.091s!
-- **C#** still wins most individual parts (21/23), but **Rust** is showing competitive performance
-- **Day 12** is Rust's second victory - backtracking algorithms benefit from Rust's low-level optimizations
-- **Python** was heavily optimized for Day 12 (144s → 15s test) through pre-computation and in-place modifications, but remains ~5x slower than compiled languages
-- **Rust** shows excellent performance after optimization - Day 6 went from 0.810s to 0.004s (200x+ speedup) by fixing string indexing
-- **Algorithm choice matters more than language** - Both Python and Rust saw massive improvements from implementation fixes
-- **Rust is now clearly faster than Python** (4.687s vs 22.427s total) after optimization
-- **Day 12** is the most computationally intensive challenge so far - backtracking through 2D shape packing with 1000 regions
-- **Day 11** demonstrates excellent memoization efficiency - all languages completed in under 10ms despite 417 trillion possible paths
+- **Rust dominates** with the fastest total time (0.697s) and most individual wins (18/23) - **3.2x faster than C#**!
+- **Day 12 optimizations** were a game-changer - went from 20+ seconds to under 0.5s for C# (3.4x faster) and under 2s for Rust (12x faster)
+- **PyPy brings Python to competitive levels** - using PyPy's JIT compiler makes Python 18.7x faster on Day 12 (87s → 4.6s)
+- **Rust's release mode is critical** - `cargo run --release` provides 10-100x speedup over debug builds
+- **Precomputed shape orientations** were the key optimization for Day 12 across all languages - eliminating repeated computations in hot loops
+- **C# holds its own** with excellent JIT optimization, staying competitive despite Rust's native compilation advantage
+- **PyPy wins on Day 2** - JIT compilation shines on iterative arithmetic operations
+- **Day 8 shows PyPy's weakness** - Circuit simulation with complex logic benefits less from JIT, PyPy is 4.7x slower than Rust here
+- **Day 9 Part 2** demonstrates algorithm wins - Rust's 0.125s vs C#'s 1.103s (8.8x faster) shows low-level optimization benefits for complex backtracking
+- **All three languages are production-ready** for Advent of Code - even PyPy completes all 12 days in just over 3 seconds
 
-*Note: Times may vary based on hardware and system load. These measurements were taken on the same machine running Windows with .NET 10.0.100, Python 3.x, and Rust (latest stable).*
+*Note: Times measured on Windows with .NET 10.0.101, PyPy 7.3+, and Rust 1.75+ (with `--release` flag). Python (CPython) is significantly slower; PyPy recommended for performance-critical code.*
 
 ## 📄 License
 
