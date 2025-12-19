@@ -100,7 +100,7 @@ def can_fit_all_presents(region, all_orientations):
 
 
 def try_place_presents(grid, width, height, counts, all_orientations, call_count):
-    """Recursively try to place all presents using backtracking with smart placement."""
+    """Recursively try to place all presents using backtracking."""
     call_count[0] += 1
     if call_count[0] > 2000000:
         return False
@@ -109,37 +109,32 @@ def try_place_presents(grid, width, height, counts, all_orientations, call_count
     if all(count == 0 for count in counts):
         return True
 
-    # Find first empty cell (smart placement strategy)
-    try:
-        start_idx = grid.index(False)
-    except ValueError:
-        # No empty cell but presents remain - impossible
-        return False
-
-    start_row = start_idx // width
-    start_col = start_idx % width
-
-    # Try each shape type at the first empty position
+    # Try placing first available present type
     for shape_idx in range(len(counts)):
         if counts[shape_idx] == 0:
             continue
 
         orientations = all_orientations[shape_idx]
 
-        # Try each orientation
+        # Try each orientation at each position
         for shape in orientations:
-            if can_place_shape(grid, width, height, shape, start_row, start_col):
-                place_shape(grid, width, shape, start_row, start_col)
-                counts[shape_idx] -= 1
+            for row in range(max(0, height - shape.height + 1)):
+                for col in range(max(0, width - shape.width + 1)):
+                    if can_place_shape(grid, width, height, shape, row, col):
+                        place_shape(grid, width, shape, row, col)
+                        counts[shape_idx] -= 1
 
-                if try_place_presents(grid, width, height, counts, all_orientations, call_count):
-                    return True
+                        if try_place_presents(grid, width, height, counts, all_orientations, call_count):
+                            return True
 
-                # Backtrack
-                remove_shape(grid, width, shape, start_row, start_col)
-                counts[shape_idx] += 1
+                        # Backtrack
+                        remove_shape(grid, width, shape, row, col)
+                        counts[shape_idx] += 1
 
-    return False
+        # If we couldn't place this present type anywhere, fail
+        return False
+
+    return True
 
 
 def can_place_shape(grid, width, height, shape, start_row, start_col):
