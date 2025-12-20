@@ -55,8 +55,12 @@ public static class Day12
                 int width = int.Parse(dimensions[0]);
                 int height = int.Parse(dimensions[1]);
 
-                var counts = parts[1].Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(int.Parse).ToArray();
+                var countParts = parts[1].Trim().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                var counts = new int[countParts.Length];
+                for (int j = 0; j < countParts.Length; j++)
+                {
+                    counts[j] = int.Parse(countParts[j]);
+                }
 
                 regions.Add(new Region(width, height, counts));
                 i++;
@@ -108,7 +112,8 @@ public static class Day12
         }
 
         var grid = new bool[region.Height * region.Width];
-        var counts = (int[])region.Counts.Clone();
+        var counts = new int[region.Counts.Length];
+        Array.Copy(region.Counts, counts, region.Counts.Length);
 
         return TryPlacePresents(grid, region.Width, region.Height, counts, allOrientations, 0);
     }
@@ -227,7 +232,13 @@ public static class Day12
             current = Rotate(current);
         }
 
-        return orientations.Select(s => new Shape(s.Split('|'))).ToArray();
+        var result = new Shape[orientations.Count];
+        int idx = 0;
+        foreach (var s in orientations)
+        {
+            result[idx++] = new Shape(s.Split('|'));
+        }
+        return result;
     }
 
     private static List<string> Rotate(List<string> shape)
@@ -251,7 +262,18 @@ public static class Day12
 
     private static List<string> Flip(List<string> shape)
     {
-        return shape.Select(row => new string(row.Reverse().ToArray())).ToList();
+        var flipped = new List<string>(shape.Count);
+        for (int i = 0; i < shape.Count; i++)
+        {
+            var row = shape[i];
+            var chars = new char[row.Length];
+            for (int j = 0; j < row.Length; j++)
+            {
+                chars[j] = row[row.Length - 1 - j];
+            }
+            flipped.Add(new string(chars));
+        }
+        return flipped;
     }
 
     private record Region(int Width, int Height, int[] Counts);
@@ -291,7 +313,11 @@ public static class Day12
             }
 
             Height = lines.Length;
-            Width = lines.Max(l => l.Length);
+            Width = 0;
+            for (int i = 0; i < lines.Length; i++)
+            {
+                if (lines[i].Length > Width) Width = lines[i].Length;
+            }
             Area = CellCount;
         }
     }

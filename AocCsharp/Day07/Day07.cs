@@ -22,8 +22,12 @@ public static class Day07
         var lines = input.Replace("\r", "").Split('\n', StringSplitOptions.RemoveEmptyEntries);
         if (lines.Length == 0) return 0;
 
-        var grid = lines.Select(l => l.ToCharArray()).ToArray();
-        int height = grid.Length;
+        int height = lines.Length;
+        var grid = new char[height][];
+        for (int i = 0; i < height; i++)
+        {
+            grid[i] = lines[i].ToCharArray();
+        }
         int width = grid[0].Length;
 
         // Find starting position 'S'
@@ -95,8 +99,12 @@ public static class Day07
         var lines = input.Replace("\r", "").Split('\n', StringSplitOptions.RemoveEmptyEntries);
         if (lines.Length == 0) return 0;
 
-        var grid = lines.Select(l => l.ToCharArray()).ToArray();
-        int height = grid.Length;
+        int height = lines.Length;
+        var grid = new char[height][];
+        for (int i = 0; i < height; i++)
+        {
+            grid[i] = lines[i].ToCharArray();
+        }
         int width = grid[0].Length;
 
         // Find starting position 'S'
@@ -135,23 +143,20 @@ public static class Day07
                     // Each existing path splits into two timelines
                     if (col - 1 >= 0)
                     {
-                        if (!nextPaths.ContainsKey(col - 1))
-                            nextPaths[col - 1] = 0;
-                        nextPaths[col - 1] += pathCount;
+                        nextPaths.TryGetValue(col - 1, out long leftCount);
+                        nextPaths[col - 1] = leftCount + pathCount;
                     }
                     if (col + 1 < width)
                     {
-                        if (!nextPaths.ContainsKey(col + 1))
-                            nextPaths[col + 1] = 0;
-                        nextPaths[col + 1] += pathCount;
+                        nextPaths.TryGetValue(col + 1, out long rightCount);
+                        nextPaths[col + 1] = rightCount + pathCount;
                     }
                 }
                 else
                 {
                     // Empty space - particle continues downward
-                    if (!nextPaths.ContainsKey(col))
-                        nextPaths[col] = 0;
-                    nextPaths[col] += pathCount;
+                    nextPaths.TryGetValue(col, out long currentCount);
+                    nextPaths[col] = currentCount + pathCount;
                 }
             }
 
@@ -165,6 +170,11 @@ public static class Day07
         }
 
         // Sum all timelines that reach the bottom
-        return currentPaths.Values.Sum();
+        long total = 0;
+        foreach (var count in currentPaths.Values)
+        {
+            total += count;
+        }
+        return total;
     }
 }

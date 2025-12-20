@@ -17,7 +17,19 @@ public static class Day08
         TestRunner.RunSolution("Part 2", Part2, testInputPath, realInputPath, expectedTestResult: 25272);
     }
 
-    private record Point3D(int X, int Y, int Z);
+    private readonly struct Point3D
+    {
+        public readonly int X;
+        public readonly int Y;
+        public readonly int Z;
+
+        public Point3D(int x, int y, int z)
+        {
+            X = x;
+            Y = y;
+            Z = z;
+        }
+    }
 
     public static long Part1(string input)
     {
@@ -28,14 +40,19 @@ public static class Day08
         var points = new List<Point3D>();
         foreach (var line in lines)
         {
-            var parts = line.Split(',');
-            if (parts.Length == 3)
+            int firstComma = line.IndexOf(',');
+            if (firstComma > 0)
             {
-                points.Add(new Point3D(
-                    int.Parse(parts[0]),
-                    int.Parse(parts[1]),
-                    int.Parse(parts[2])
-                ));
+                int secondComma = line.IndexOf(',', firstComma + 1);
+                if (secondComma > firstComma)
+                {
+                    if (int.TryParse(line.AsSpan(0, firstComma), out int x) &&
+                        int.TryParse(line.AsSpan(firstComma + 1, secondComma - firstComma - 1), out int y) &&
+                        int.TryParse(line.AsSpan(secondComma + 1), out int z))
+                    {
+                        points.Add(new Point3D(x, y, z));
+                    }
+                }
             }
         }
 
@@ -49,11 +66,10 @@ public static class Day08
             {
                 var p1 = points[i];
                 var p2 = points[j];
-                double dist = Math.Sqrt(
-                    Math.Pow(p1.X - p2.X, 2) +
-                    Math.Pow(p1.Y - p2.Y, 2) +
-                    Math.Pow(p1.Z - p2.Z, 2)
-                );
+                long dx = p1.X - p2.X;
+                long dy = p1.Y - p2.Y;
+                long dz = p1.Z - p2.Z;
+                double dist = Math.Sqrt(dx * dx + dy * dy + dz * dz);
                 distances.Add((dist, i, j));
             }
         }
@@ -118,13 +134,13 @@ public static class Day08
         for (int i = 0; i < n; i++)
         {
             int root = Find(i);
-            if (!circuitSizes.ContainsKey(root))
-                circuitSizes[root] = 0;
-            circuitSizes[root]++;
+            circuitSizes.TryGetValue(root, out int count);
+            circuitSizes[root] = count + 1;
         }
 
         // Get the three largest circuit sizes
-        var sizes = circuitSizes.Values.OrderByDescending(x => x).ToList();
+        var sizes = new List<int>(circuitSizes.Values);
+        sizes.Sort((a, b) => b.CompareTo(a)); // Descending
 
         if (sizes.Count >= 3)
         {
@@ -151,14 +167,19 @@ public static class Day08
         var points = new List<Point3D>();
         foreach (var line in lines)
         {
-            var parts = line.Split(',');
-            if (parts.Length == 3)
+            int firstComma = line.IndexOf(',');
+            if (firstComma > 0)
             {
-                points.Add(new Point3D(
-                    int.Parse(parts[0]),
-                    int.Parse(parts[1]),
-                    int.Parse(parts[2])
-                ));
+                int secondComma = line.IndexOf(',', firstComma + 1);
+                if (secondComma > firstComma)
+                {
+                    if (int.TryParse(line.AsSpan(0, firstComma), out int x) &&
+                        int.TryParse(line.AsSpan(firstComma + 1, secondComma - firstComma - 1), out int y) &&
+                        int.TryParse(line.AsSpan(secondComma + 1), out int z))
+                    {
+                        points.Add(new Point3D(x, y, z));
+                    }
+                }
             }
         }
 
@@ -172,11 +193,10 @@ public static class Day08
             {
                 var p1 = points[i];
                 var p2 = points[j];
-                double dist = Math.Sqrt(
-                    Math.Pow(p1.X - p2.X, 2) +
-                    Math.Pow(p1.Y - p2.Y, 2) +
-                    Math.Pow(p1.Z - p2.Z, 2)
-                );
+                long dx = p1.X - p2.X;
+                long dy = p1.Y - p2.Y;
+                long dz = p1.Z - p2.Z;
+                double dist = Math.Sqrt(dx * dx + dy * dy + dz * dz);
                 distances.Add((dist, i, j));
             }
         }
@@ -200,6 +220,9 @@ public static class Day08
             return parent[x];
         }
 
+        // Track number of circuits - starts at n (each node is its own circuit)
+        int circuitCount = n;
+
         bool Union(int x, int y)
         {
             int rootX = Find(x);
@@ -217,19 +240,10 @@ public static class Day08
                     parent[rootY] = rootX;
                     size[rootX] += size[rootY];
                 }
+                circuitCount--; // Merged two circuits into one
                 return true; // Actually connected
             }
             return false; // Already connected
-        }
-
-        int CountCircuits()
-        {
-            var roots = new HashSet<int>();
-            for (int i = 0; i < n; i++)
-            {
-                roots.Add(Find(i));
-            }
-            return roots.Count;
         }
 
         // Connect pairs until there's only one circuit
@@ -242,7 +256,7 @@ public static class Day08
                 lastI = i;
                 lastJ = j;
 
-                if (CountCircuits() == 1)
+                if (circuitCount == 1)
                 {
                     // All connected!
                     break;

@@ -51,25 +51,47 @@ public static class Day10
     private static (bool[] Target, List<bool[]> Buttons) ParseMachine(string line)
     {
         // Extract indicator pattern [.##.]
-        var indicatorMatch = Regex.Match(line, @"\[(\.|\#)+\]");
-        string indicator = indicatorMatch.Value.Trim('[', ']');
-        bool[] target = indicator.Select(c => c == '#').ToArray();
+        int indicatorStart = line.IndexOf('[');
+        int indicatorEnd = line.IndexOf(']');
+        var indicatorSpan = line.AsSpan(indicatorStart + 1, indicatorEnd - indicatorStart - 1);
+
+        bool[] target = new bool[indicatorSpan.Length];
+        for (int i = 0; i < indicatorSpan.Length; i++)
+        {
+            target[i] = indicatorSpan[i] == '#';
+        }
 
         // Extract button patterns (0,1,2)
-        var buttonMatches = Regex.Matches(line, @"\([\d,]+\)");
         var buttons = new List<bool[]>();
+        int pos = indicatorEnd + 1;
 
-        foreach (Match match in buttonMatches)
+        while (pos < line.Length)
         {
-            string buttonStr = match.Value.Trim('(', ')');
-            var indices = buttonStr.Split(',').Select(int.Parse).ToArray();
+            int openParen = line.IndexOf('(', pos);
+            if (openParen == -1) break;
+
+            int closeParen = line.IndexOf(')', openParen);
+            var buttonSpan = line.AsSpan(openParen + 1, closeParen - openParen - 1);
 
             bool[] button = new bool[target.Length];
-            foreach (int idx in indices)
+            int start = 0;
+            while (start < buttonSpan.Length)
             {
-                button[idx] = true;
+                int commaPos = buttonSpan.Slice(start).IndexOf(',');
+                ReadOnlySpan<char> numSpan = commaPos == -1
+                    ? buttonSpan.Slice(start)
+                    : buttonSpan.Slice(start, commaPos);
+
+                if (int.TryParse(numSpan, out int idx))
+                {
+                    button[idx] = true;
+                }
+
+                if (commaPos == -1) break;
+                start += commaPos + 1;
             }
             buttons.Add(button);
+            pos = closeParen + 1;
         }
 
         return (target, buttons);
@@ -210,7 +232,11 @@ public static class Day10
             }
 
             // Count presses
-            int presses = solution.Count(x => x);
+            int presses = 0;
+            for (int i = 0; i < solution.Length; i++)
+            {
+                if (solution[i]) presses++;
+            }
             minPresses = Math.Min(minPresses, presses);
         }
 
@@ -220,25 +246,65 @@ public static class Day10
     private static (int[] Targets, List<int[]> Buttons) ParseMachinePart2(string line)
     {
         // Extract joltage requirements {3,5,4,7}
-        var joltsMatch = Regex.Match(line, @"\{[\d,]+\}");
-        string joltsStr = joltsMatch.Value.Trim('{', '}');
-        int[] targets = joltsStr.Split(',').Select(int.Parse).ToArray();
+        int joltsStart = line.IndexOf('{');
+        int joltsEnd = line.IndexOf('}');
+        var joltsSpan = line.AsSpan(joltsStart + 1, joltsEnd - joltsStart - 1);
 
-        // Extract button patterns (0,1,2)
-        var buttonMatches = Regex.Matches(line, @"\([\d,]+\)");
-        var buttons = new List<int[]>();
-
-        foreach (Match match in buttonMatches)
+        // Parse targets
+        var targetsList = new List<int>();
+        int start = 0;
+        while (start < joltsSpan.Length)
         {
-            string buttonStr = match.Value.Trim('(', ')');
-            var indices = buttonStr.Split(',').Select(int.Parse).ToArray();
+            int commaPos = joltsSpan.Slice(start).IndexOf(',');
+            ReadOnlySpan<char> numSpan = commaPos == -1
+                ? joltsSpan.Slice(start)
+                : joltsSpan.Slice(start, commaPos);
+
+            if (int.TryParse(numSpan, out int val))
+            {
+                targetsList.Add(val);
+            }
+
+            if (commaPos == -1) break;
+            start += commaPos + 1;
+        }
+        int[] targets = targetsList.ToArray();
+
+        // Extract button patterns (0,1,2) - they appear BEFORE the {targets}
+        // Find the end of the indicator section first
+        int indicatorEnd = line.IndexOf(']');
+
+        var buttons = new List<int[]>();
+        int pos = indicatorEnd + 1;
+
+        // Parse all buttons between ] and {
+        while (pos < joltsStart)
+        {
+            int openParen = line.IndexOf('(', pos);
+            if (openParen == -1 || openParen >= joltsStart) break;
+
+            int closeParen = line.IndexOf(')', openParen);
+            var buttonSpan = line.AsSpan(openParen + 1, closeParen - openParen - 1);
 
             int[] button = new int[targets.Length];
-            foreach (int idx in indices)
+            start = 0;
+            while (start < buttonSpan.Length)
             {
-                button[idx] = 1; // Each button press adds 1 to these counters
+                int commaPos = buttonSpan.Slice(start).IndexOf(',');
+                ReadOnlySpan<char> numSpan = commaPos == -1
+                    ? buttonSpan.Slice(start)
+                    : buttonSpan.Slice(start, commaPos);
+
+                if (int.TryParse(numSpan, out int idx))
+                {
+                    button[idx] = 1;
+                }
+
+                if (commaPos == -1) break;
+                start += commaPos + 1;
             }
             buttons.Add(button);
+            pos = closeParen + 1;
         }
 
         return (targets, buttons);
@@ -357,19 +423,29 @@ public static class Day10
                 }
             }
 
-            return solution.Sum();
+            int total = 0;
+            for (int i = 0; i < solution.Length; i++)
+            {
+                total += solution[i];
+            }
+            return total;
         }
 
         // Use recursive search with pruning for free variables
         int[] currentSolution = new int[numButtons];
-        int maxFreeValue = targets.Max();
+        int[] testSolution = new int[numButtons]; // Reuse instead of cloning
+        int maxFreeValue = 0;
+        for (int i = 0; i < targets.Length; i++)
+        {
+            if (targets[i] > maxFreeValue) maxFreeValue = targets[i];
+        }
 
         void SearchSolutions(int freeVarIdx)
         {
             if (freeVarIdx == freeVars.Count)
             {
-                // Back-substitute for pivot variables
-                int[] testSolution = (int[])currentSolution.Clone();
+                // Back-substitute for pivot variables - reuse testSolution array
+                Array.Copy(currentSolution, testSolution, numButtons);
                 bool valid = true;
 
                 for (int r = numCounters - 1; r >= 0; r--)
@@ -403,7 +479,11 @@ public static class Day10
 
                 if (valid)
                 {
-                    int presses = testSolution.Sum();
+                    int presses = 0;
+                    for (int i = 0; i < testSolution.Length; i++)
+                    {
+                        presses += testSolution[i];
+                    }
                     minPresses = Math.Min(minPresses, presses);
                 }
                 return;
@@ -411,7 +491,12 @@ public static class Day10
 
             // Try values for this free variable
             int varIdx = freeVars[freeVarIdx];
-            int upperBound = Math.Min(maxFreeValue, minPresses - currentSolution.Sum());
+            int currentSum = 0;
+            for (int i = 0; i < numButtons; i++)
+            {
+                currentSum += currentSolution[i];
+            }
+            int upperBound = Math.Min(maxFreeValue, minPresses - currentSum);
 
             for (int value = 0; value <= upperBound; value++)
             {

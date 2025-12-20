@@ -25,12 +25,15 @@ public static class Day09
         var redTiles = new List<(int X, int Y)>();
         foreach (var line in lines)
         {
-            var parts = line.Split(',');
-            if (parts.Length == 2)
+            int commaIndex = line.IndexOf(',');
+            if (commaIndex > 0)
             {
-                int x = int.Parse(parts[0].Trim());
-                int y = int.Parse(parts[1].Trim());
-                redTiles.Add((x, y));
+                var xSpan = line.AsSpan(0, commaIndex).Trim();
+                var ySpan = line.AsSpan(commaIndex + 1).Trim();
+                if (int.TryParse(xSpan, out int x) && int.TryParse(ySpan, out int y))
+                {
+                    redTiles.Add((x, y));
+                }
             }
         }
 
@@ -64,22 +67,29 @@ public static class Day09
         var redTiles = new List<(int X, int Y)>();
         foreach (var line in lines)
         {
-            var parts = line.Split(',');
-            if (parts.Length == 2)
+            int commaIndex = line.IndexOf(',');
+            if (commaIndex > 0)
             {
-                int x = int.Parse(parts[0].Trim());
-                int y = int.Parse(parts[1].Trim());
-                redTiles.Add((x, y));
+                var xSpan = line.AsSpan(0, commaIndex).Trim();
+                var ySpan = line.AsSpan(commaIndex + 1).Trim();
+                if (int.TryParse(xSpan, out int x) && int.TryParse(ySpan, out int y))
+                {
+                    redTiles.Add((x, y));
+                }
             }
         }
 
         if (redTiles.Count < 2) return 0;
 
+        // Pre-compute tile set for fast lookup
+        var tileSet = new HashSet<(int, int)>(redTiles);
+        int n = redTiles.Count;
+
         long maxArea = 0;
 
-        for (int i = 0; i < redTiles.Count; i++)
+        for (int i = 0; i < n; i++)
         {
-            for (int j = i + 1; j < redTiles.Count; j++)
+            for (int j = i + 1; j < n; j++)
             {
                 var tile1 = redTiles[i];
                 var tile2 = redTiles[j];
@@ -89,13 +99,13 @@ public static class Day09
                 int rectMinY = Math.Min(tile1.Y, tile2.Y);
                 int rectMaxY = Math.Max(tile1.Y, tile2.Y);
 
-                if (!IsInsideOrOnBoundary((rectMinX, rectMinY), redTiles)) continue;
-                if (!IsInsideOrOnBoundary((rectMinX, rectMaxY), redTiles)) continue;
-                if (!IsInsideOrOnBoundary((rectMaxX, rectMinY), redTiles)) continue;
-                if (!IsInsideOrOnBoundary((rectMaxX, rectMaxY), redTiles)) continue;
+                if (!IsInsideOrOnBoundaryFast((rectMinX, rectMinY), redTiles, tileSet)) continue;
+                if (!IsInsideOrOnBoundaryFast((rectMinX, rectMaxY), redTiles, tileSet)) continue;
+                if (!IsInsideOrOnBoundaryFast((rectMaxX, rectMinY), redTiles, tileSet)) continue;
+                if (!IsInsideOrOnBoundaryFast((rectMaxX, rectMaxY), redTiles, tileSet)) continue;
 
                 bool hasInteriorTile = false;
-                for (int k = 0; k < redTiles.Count && !hasInteriorTile; k++)
+                for (int k = 0; k < n && !hasInteriorTile; k++)
                 {
                     var tile = redTiles[k];
                     if (tile.X > rectMinX && tile.X < rectMaxX && tile.Y > rectMinY && tile.Y < rectMaxY)
@@ -107,10 +117,10 @@ public static class Day09
                 if (hasInteriorTile) continue;
 
                 bool hasCrossing = false;
-                for (int k = 0; k < redTiles.Count && !hasCrossing; k++)
+                for (int k = 0; k < n && !hasCrossing; k++)
                 {
                     var p1 = redTiles[k];
-                    var p2 = redTiles[(k + 1) % redTiles.Count];
+                    var p2 = redTiles[(k + 1) % n];
 
                     if (SegmentsProperlyIntersect(p1, p2, (rectMinX, rectMinY), (rectMaxX, rectMinY)) ||
                         SegmentsProperlyIntersect(p1, p2, (rectMinX, rectMaxY), (rectMaxX, rectMaxY)) ||
@@ -132,6 +142,30 @@ public static class Day09
         }
 
         return maxArea;
+    }
+
+    private static bool IsInsideOrOnBoundaryFast((int X, int Y) point, List<(int X, int Y)> polygon, HashSet<(int, int)> tileSet)
+    {
+        // Fast path: check if point is one of the tiles
+        if (tileSet.Contains(point))
+        {
+            return true;
+        }
+
+        // Check if point is on any edge
+        int n = polygon.Count;
+        for (int i = 0; i < n; i++)
+        {
+            var p1 = polygon[i];
+            var p2 = polygon[(i + 1) % n];
+
+            if (IsPointOnSegment(point, p1, p2))
+            {
+                return true;
+            }
+        }
+
+        return IsInsidePolygon(point, polygon);
     }
 
     private static bool IsInsideOrOnBoundary((int X, int Y) point, List<(int X, int Y)> polygon)
