@@ -295,20 +295,20 @@ Execution times for real puzzle inputs across all three language implementations
 | | Part 1 | 0.001s | 0.009s | 0.000s | 🥇 Rust |
 | | Part 2 | 0.000s | 0.007s | 0.000s | 🥇 C# / Rust |
 | **2** | Gift Shop |
-| | Part 1 | 0.051s | 0.029s | 0.056s | 🥇 PyPy |
-| | Part 2 | 0.102s | 0.087s | 0.169s | 🥇 PyPy |
+| | Part 1 | 0.018s | 0.029s | 0.019s | 🥇 C# |
+| | Part 2 | 0.049s | 0.087s | 0.055s | 🥇 C# |
 | **3** | Printing Department |
-| | Part 1 | 0.007s | 0.010s | 0.002s | 🥇 Rust |
-| | Part 2 | 0.002s | 0.013s | 0.001s | 🥇 Rust |
+| | Part 1 | 0.000s | 0.010s | 0.000s | 🥇 C# / Rust |
+| | Part 2 | 0.000s | 0.013s | 0.000s | 🥇 C# / Rust |
 | **4** | Printing Department |
-| | Part 1 | 0.002s | 0.018s | 0.000s | 🥇 Rust |
-| | Part 2 | 0.042s | 0.042s | 0.006s | 🥇 Rust |
+| | Part 1 | 0.001s | 0.018s | 0.000s | 🥇 Rust |
+| | Part 2 | 0.024s | 0.042s | 0.006s | 🥇 Rust |
 | **5** | Cafeteria |
-| | Part 1 | 0.003s | 0.007s | 0.000s | 🥇 Rust |
-| | Part 2 | 0.001s | 0.001s | 0.000s | 🥇 Rust |
+| | Part 1 | 0.000s | 0.007s | 0.000s | 🥇 C# / Rust |
+| | Part 2 | 0.000s | 0.001s | 0.000s | 🥇 C# / Rust |
 | **6** | Trash Compactor (Math Worksheet) |
-| | Part 1 | 0.001s | 0.018s | 0.001s | 🥇 C# / Rust |
-| | Part 2 | 0.001s | 0.014s | 0.001s | 🥇 C# / Rust |
+| | Part 1 | 0.001s | 0.019s | 0.000s | 🥇 Rust |
+| | Part 2 | 0.000s | 0.020s | 0.001s | 🥇 C# |
 | **7** | Laboratories (Tachyon Manifold) |
 | | Part 1 | 0.000s | 0.007s | 0.000s | 🥇 C# / Rust |
 | | Part 2 | 0.001s | 0.011s | 0.000s | 🥇 Rust |

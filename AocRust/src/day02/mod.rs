@@ -51,29 +51,37 @@ fn is_invalid_id_part1(n: i64) -> bool {
     }
 
     let half = s.len() / 2;
-    let first_half = &s[0..half];
-    let second_half = &s[half..];
+    let bytes = s.as_bytes();
 
-    first_half == second_half
+    // Compare characters directly without creating substrings
+    for i in 0..half {
+        if bytes[i] != bytes[half + i] {
+            return false;
+        }
+    }
+
+    true
 }
 
 fn is_invalid_id_part2(n: i64) -> bool {
     let s = n.to_string();
     let len = s.len();
+    let bytes = s.as_bytes();
 
     // Try all possible pattern lengths L
     // The pattern must repeat at least twice, so L can go up to len / 2
     for l in 1..=(len / 2) {
         if len % l == 0 {
-            let k = len / l; // Number of repetitions
-            // k is guaranteed to be >= 2 because l <= len / 2
+            // Check if s is composed of repetitions of the first l characters
+            let mut match_found = true;
+            for i in l..len {
+                if bytes[i] != bytes[i % l] {
+                    match_found = false;
+                    break;
+                }
+            }
 
-            let pattern = &s[0..l];
-            
-            // Check if s is composed of k repetitions of pattern
-            // We can construct the expected string and compare
-            let repeated = pattern.repeat(k);
-            if repeated == s {
+            if match_found {
                 return true;
             }
         }

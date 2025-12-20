@@ -5,71 +5,69 @@ use crate::utils;
 /// Count how many times the dial points at 0 after rotations
 pub fn part1(input: &str) -> i32 {
     let rotations = input.split_whitespace();
-    
+
     let mut position: i32 = 50; // Starting position
     let mut zero_count = 0;
-    
+
     for rotation in rotations {
-        if rotation.is_empty() { continue; }
-        if rotation.len() < 2 { continue; }
-        // println!("DEBUG: '{}'", rotation);
-        let direction = rotation.chars().next().unwrap();
-        let distance_str = rotation[1..].trim();
-        let distance: i32 = distance_str.parse().expect(&format!("Failed to parse distance from '{}'", rotation));
-        
+        let bytes = rotation.as_bytes();
+        if bytes.len() < 2 { continue; }
+
+        let direction = bytes[0];
+        let distance: i32 = rotation[1..].parse().unwrap();
+
         match direction {
-            'L' => {
+            b'L' => {
                 position = (position - distance).rem_euclid(100);
             }
-            'R' => {
+            b'R' => {
                 position = (position + distance).rem_euclid(100);
             }
             _ => {}
         }
-        
+
         if position == 0 {
             zero_count += 1;
         }
     }
-    
+
     zero_count
 }
 
 /// Part 2: Count number of times dial points at 0 during rotations
 pub fn part2(input: &str) -> i32 {
     let rotations = input.split_whitespace();
-    
+
     let mut position: i32 = 50; // Starting position
     let mut zero_count = 0;
-    
+
     for rotation in rotations {
-        if rotation.is_empty() { continue; }
-        if rotation.len() < 2 { continue; }
-        // println!("DEBUG: '{}'", rotation);
-        let direction = rotation.chars().next().unwrap();
-        let distance_str = rotation[1..].trim();
-        let distance: i32 = distance_str.parse().expect(&format!("Failed to parse distance from '{}'", rotation));
-        
+        let bytes = rotation.as_bytes();
+        if bytes.len() < 2 { continue; }
+
+        let direction = bytes[0];
+        let distance: i32 = rotation[1..].parse().unwrap();
+
         match direction {
-            'R' => {
+            b'R' => {
                 // Moving right: count multiples of 100 in range (position, position + distance]
                 zero_count += (position + distance) / 100;
                 position = (position + distance).rem_euclid(100);
             }
-            'L' => {
+            b'L' => {
                 // Moving left: count multiples of 100 in range [position - distance, position)
                 // Count = floor((pos - 1) / 100) - floor((pos - dist - 1) / 100)
-                
+
                 let start_floor = if (position - 1) < 0 { -1 } else { 0 };
                 let end_floor = (position - distance - 1).div_euclid(100);
-                
+
                 zero_count += start_floor - end_floor;
                 position = (position - distance).rem_euclid(100);
             }
             _ => {}
         }
     }
-    
+
     zero_count
 }
 

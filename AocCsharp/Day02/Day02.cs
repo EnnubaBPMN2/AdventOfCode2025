@@ -60,10 +60,15 @@ public static class Day02
         if (s.Length % 2 != 0) return false;
 
         int half = s.Length / 2;
-        string firstHalf = s.Substring(0, half);
-        string secondHalf = s.Substring(half);
 
-        return firstHalf == secondHalf;
+        // Compare characters directly without creating substrings
+        for (int i = 0; i < half; i++)
+        {
+            if (s[i] != s[half + i])
+                return false;
+        }
+
+        return true;
     }
 
     private static bool IsInvalidIdPart2(long id)
@@ -77,16 +82,11 @@ public static class Day02
         {
             if (len % L == 0)
             {
-                int k = len / L; // Number of repetitions
-                // k is guaranteed to be >= 2 because L <= len / 2
-                
-                string pattern = s.Substring(0, L);
-                
-                // Check if s is composed of k repetitions of pattern
+                // Check if s is composed of repetitions of the first L characters
                 bool match = true;
-                for (int i = 1; i < k; i++)
+                for (int i = L; i < len; i++)
                 {
-                    if (s.Substring(i * L, L) != pattern)
+                    if (s[i] != s[i % L])
                     {
                         match = false;
                         break;

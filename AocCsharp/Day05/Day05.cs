@@ -121,13 +121,17 @@ public static class Day05
 
     private static List<(long Start, long End)> ParseRanges(string[] lines)
     {
-        var ranges = new List<(long Start, long End)>();
+        var ranges = new List<(long Start, long End)>(lines.Length);
         foreach (var line in lines)
         {
-            var parts = line.Split('-');
-            if (parts.Length == 2 && long.TryParse(parts[0], out long start) && long.TryParse(parts[1], out long end))
+            int dashIndex = line.IndexOf('-');
+            if (dashIndex > 0 && dashIndex < line.Length - 1)
             {
-                ranges.Add((start, end));
+                if (long.TryParse(line.AsSpan(0, dashIndex), out long start) &&
+                    long.TryParse(line.AsSpan(dashIndex + 1), out long end))
+                {
+                    ranges.Add((start, end));
+                }
             }
         }
         return ranges;

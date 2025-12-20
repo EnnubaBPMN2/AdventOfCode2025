@@ -32,14 +32,14 @@ public static class Day01
     {
         // Parse the rotations (handle spaces and newlines)
         var rotations = input.Split(new[] { ' ', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-        
+
         int position = 50;  // Starting position
         int zeroCount = 0;
 
         foreach (var rotation in rotations)
         {
             var direction = rotation[0];
-            var distance = int.Parse(rotation.Substring(1));
+            var distance = int.Parse(rotation.AsSpan(1));
 
             if (direction == 'L')
             {
@@ -64,14 +64,14 @@ public static class Day01
     {
         // Parse the rotations (handle spaces and newlines)
         var rotations = input.Split(new[] { ' ', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-        
+
         int position = 50;  // Starting position
         int zeroCount = 0;
 
         foreach (var rotation in rotations)
         {
             var direction = rotation[0];
-            var distance = int.Parse(rotation.Substring(1));
+            var distance = int.Parse(rotation.AsSpan(1));
 
             if (direction == 'R')
             {
@@ -83,17 +83,20 @@ public static class Day01
             else if (direction == 'L')
             {
                 // Moving left: count multiples of 100 in range [position - distance, position)
-                // We use floor division logic. 
                 // Count = floor((pos - 1) / 100) - floor((pos - dist - 1) / 100)
-                
+
                 // Since pos is always [0, 99], floor((pos - 1) / 100) is:
                 // 0 if pos > 0
                 // -1 if pos == 0
                 int startFloor = (position - 1) < 0 ? -1 : 0;
-                int endFloor = (int)Math.Floor((double)(position - distance - 1) / 100);
-                
+
+                // For negative numbers, C# integer division truncates toward zero, not floor
+                // We need floor division, so use Math.Floor for negative values
+                int temp = position - distance - 1;
+                int endFloor = temp >= 0 ? temp / 100 : (int)Math.Floor((double)temp / 100);
+
                 zeroCount += startFloor - endFloor;
-                
+
                 position = (position - distance) % 100;
                 if (position < 0) position += 100;
             }

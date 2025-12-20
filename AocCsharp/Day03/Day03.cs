@@ -21,20 +21,22 @@ public static class Day03
         // Input format: Multi-line string of digits
         input = input.Replace("\r", "").Trim();
         var lines = input.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-        
+
         long totalOutputJoltage = 0;
 
         foreach (var line in lines)
         {
-            var digits = line.Trim().Select(c => int.Parse(c.ToString())).ToArray();
+            var trimmed = line.Trim();
             int maxJoltage = -1;
 
             // Iterate through all pairs of indices (i, j) such that i < j
-            for (int i = 0; i < digits.Length; i++)
+            for (int i = 0; i < trimmed.Length; i++)
             {
-                for (int j = i + 1; j < digits.Length; j++)
+                int digit_i = trimmed[i] - '0';
+                for (int j = i + 1; j < trimmed.Length; j++)
                 {
-                    int joltage = digits[i] * 10 + digits[j];
+                    int digit_j = trimmed[j] - '0';
+                    int joltage = digit_i * 10 + digit_j;
                     if (joltage > maxJoltage)
                     {
                         maxJoltage = joltage;
@@ -55,42 +57,42 @@ public static class Day03
     {
         input = input.Replace("\r", "").Trim();
         var lines = input.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-        
+
         long totalOutputJoltage = 0;
         int k = 12; // Target length
 
         foreach (var line in lines)
         {
-            var digits = line.Trim().Select(c => int.Parse(c.ToString())).ToArray();
-            var stack = new Stack<int>();
-            int n = digits.Length;
+            var trimmed = line.Trim();
+            var stack = new List<int>(k);
+            int n = trimmed.Length;
 
             for (int i = 0; i < n; i++)
             {
-                int digit = digits[i];
+                int digit = trimmed[i] - '0';
                 int remaining = n - 1 - i;
 
                 // While stack is not empty, current digit is greater than top of stack,
                 // and we have enough remaining digits to fill the rest of the sequence
-                while (stack.Count > 0 && digit > stack.Peek() && stack.Count + remaining >= k)
+                while (stack.Count > 0 && digit > stack[stack.Count - 1] && stack.Count + remaining >= k)
                 {
-                    stack.Pop();
+                    stack.RemoveAt(stack.Count - 1);
                 }
 
                 if (stack.Count < k)
                 {
-                    stack.Push(digit);
+                    stack.Add(digit);
                 }
             }
 
-            // Construct the number from the stack (stack is reversed order)
-            var resultDigits = stack.Reverse().ToArray();
-            string numberStr = string.Join("", resultDigits);
-            
-            if (long.TryParse(numberStr, out long maxJoltage))
+            // Construct the number directly from digits
+            long maxJoltage = 0;
+            for (int i = 0; i < stack.Count; i++)
             {
-                totalOutputJoltage += maxJoltage;
+                maxJoltage = maxJoltage * 10 + stack[i];
             }
+
+            totalOutputJoltage += maxJoltage;
         }
 
         return totalOutputJoltage;

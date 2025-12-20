@@ -23,10 +23,21 @@ public static class Day06
         if (lines.Length == 0) return 0;
 
         int height = lines.Length;
-        int width = lines.Max(l => l.Length);
+
+        // Find max width without LINQ
+        int width = 0;
+        for (int i = 0; i < lines.Length; i++)
+        {
+            if (lines[i].Length > width)
+                width = lines[i].Length;
+        }
 
         // Pad lines to ensure they are all the same length
-        var grid = lines.Select(l => l.PadRight(width)).ToArray();
+        var grid = new string[height];
+        for (int i = 0; i < height; i++)
+        {
+            grid[i] = lines[i].PadRight(width);
+        }
 
         var problems = new List<(List<long> Numbers, char Op)>();
         
@@ -89,23 +100,41 @@ public static class Day06
         char op = ' ';
 
         int height = grid.Length;
-        int width = endCol - startCol + 1;
 
         // Numbers are in all rows except the last
         for (int row = 0; row < height - 1; row++)
         {
-            var substring = grid[row].Substring(startCol, width).Trim();
-            if (!string.IsNullOrWhiteSpace(substring) && long.TryParse(substring, out long num))
+            // Find first and last non-space characters in the range
+            int start = -1;
+            int end = -1;
+            for (int col = startCol; col <= endCol; col++)
             {
-                numbers.Add(num);
+                if (grid[row][col] != ' ')
+                {
+                    if (start == -1) start = col;
+                    end = col;
+                }
+            }
+
+            if (start != -1)
+            {
+                var span = grid[row].AsSpan(start, end - start + 1);
+                if (long.TryParse(span, out long num))
+                {
+                    numbers.Add(num);
+                }
             }
         }
 
         // Operator is in the last row
-        var opString = grid[height - 1].Substring(startCol, width).Trim();
-        if (!string.IsNullOrWhiteSpace(opString))
+        for (int col = startCol; col <= endCol; col++)
         {
-            op = opString[0];
+            char c = grid[height - 1][col];
+            if (c == '+' || c == '*')
+            {
+                op = c;
+                break;
+            }
         }
 
         return (numbers, op);
@@ -117,10 +146,21 @@ public static class Day06
         if (lines.Length == 0) return 0;
 
         int height = lines.Length;
-        int width = lines.Max(l => l.Length);
+
+        // Find max width without LINQ
+        int width = 0;
+        for (int i = 0; i < lines.Length; i++)
+        {
+            if (lines[i].Length > width)
+                width = lines[i].Length;
+        }
 
         // Pad lines to ensure they are all the same length
-        var grid = lines.Select(l => l.PadRight(width)).ToArray();
+        var grid = new string[height];
+        for (int i = 0; i < height; i++)
+        {
+            grid[i] = lines[i].PadRight(width);
+        }
 
         var problems = new List<(List<long> Numbers, char Op)>();
 
@@ -183,12 +223,13 @@ public static class Day06
         char op = ' ';
 
         int height = grid.Length;
-        int width = endCol - startCol + 1;
 
         // Read each column from right to left
         for (int col = endCol; col >= startCol; col--)
         {
-            var digitChars = new List<char>();
+            // Build number directly from digits without allocations
+            long num = 0;
+            bool hasDigits = false;
 
             // Read digits from top to bottom in this column (rows 0 to height-2, excluding operator row)
             for (int row = 0; row < height - 1; row++)
@@ -196,18 +237,14 @@ public static class Day06
                 char c = grid[row][col];
                 if (c != ' ')
                 {
-                    digitChars.Add(c);
+                    num = num * 10 + (c - '0');
+                    hasDigits = true;
                 }
             }
 
-            // Build number from these digits
-            if (digitChars.Count > 0)
+            if (hasDigits)
             {
-                var numStr = new string(digitChars.ToArray());
-                if (long.TryParse(numStr, out long num))
-                {
-                    numbers.Add(num);
-                }
+                numbers.Add(num);
             }
         }
 

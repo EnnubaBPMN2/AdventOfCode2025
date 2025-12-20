@@ -2,9 +2,9 @@ use crate::utils;
 
 pub fn part1(input: &str) -> i64 {
     let input = input.trim();
-    let lines: Vec<Vec<char>> = input.lines()
-        .map(|line| line.trim().chars().collect())
-        .filter(|chars: &Vec<char>| !chars.is_empty())
+    let lines: Vec<&[u8]> = input.lines()
+        .map(|line| line.trim().as_bytes())
+        .filter(|bytes| !bytes.is_empty())
         .collect();
 
     if lines.is_empty() {
@@ -21,14 +21,14 @@ pub fn part1(input: &str) -> i64 {
 
     for r in 0..rows {
         for c in 0..cols {
-            if lines[r][c] == '@' {
+            if lines[r][c] == b'@' {
                 let mut neighbor_count = 0;
                 for i in 0..8 {
                     let nr = r as i32 + dr[i];
                     let nc = c as i32 + dc[i];
 
                     if nr >= 0 && nr < rows as i32 && nc >= 0 && nc < cols as i32 {
-                        if lines[nr as usize][nc as usize] == '@' {
+                        if lines[nr as usize][nc as usize] == b'@' {
                             neighbor_count += 1;
                         }
                     }
@@ -46,9 +46,9 @@ pub fn part1(input: &str) -> i64 {
 
 pub fn part2(input: &str) -> i64 {
     let input = input.trim();
-    let mut lines: Vec<Vec<char>> = input.lines()
-        .map(|line| line.trim().chars().collect())
-        .filter(|chars: &Vec<char>| !chars.is_empty())
+    let mut lines: Vec<Vec<u8>> = input.lines()
+        .map(|line| line.trim().as_bytes().to_vec())
+        .filter(|bytes| !bytes.is_empty())
         .collect();
 
     if lines.is_empty() {
@@ -68,14 +68,14 @@ pub fn part2(input: &str) -> i64 {
 
         for r in 0..rows {
             for c in 0..cols {
-                if lines[r][c] == '@' {
+                if lines[r][c] == b'@' {
                     let mut neighbor_count = 0;
                     for i in 0..8 {
                         let nr = r as i32 + dr[i];
                         let nc = c as i32 + dc[i];
 
                         if nr >= 0 && nr < rows as i32 && nc >= 0 && nc < cols as i32 {
-                            if lines[nr as usize][nc as usize] == '@' {
+                            if lines[nr as usize][nc as usize] == b'@' {
                                 neighbor_count += 1;
                             }
                         }
@@ -94,7 +94,7 @@ pub fn part2(input: &str) -> i64 {
 
         total_removed += to_remove.len() as i64;
         for (r, c) in to_remove {
-            lines[r][c] = '.';
+            lines[r][c] = b'.';
         }
     }
 

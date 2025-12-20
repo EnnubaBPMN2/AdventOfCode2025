@@ -67,20 +67,17 @@ public static class Day04
     {
         input = input.Replace("\r", "").Trim();
         var lines = input.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-        
+
         if (lines.Length == 0) return 0;
 
         int rows = lines.Length;
         int cols = lines[0].Length;
-        
-        // Convert to mutable grid
-        char[,] grid = new char[rows, cols];
+
+        // Convert to mutable grid using char arrays for better performance
+        char[][] grid = new char[rows][];
         for (int r = 0; r < rows; r++)
         {
-            for (int c = 0; c < cols; c++)
-            {
-                grid[r, c] = lines[r][c];
-            }
+            grid[r] = lines[r].ToCharArray();
         }
 
         // Directions: N, NE, E, SE, S, SW, W, NW
@@ -97,7 +94,7 @@ public static class Day04
             {
                 for (int c = 0; c < cols; c++)
                 {
-                    if (grid[r, c] == '@')
+                    if (grid[r][c] == '@')
                     {
                         int neighborCount = 0;
                         for (int i = 0; i < 8; i++)
@@ -105,7 +102,7 @@ public static class Day04
                             int nr = r + dr[i];
                             int nc = c + dc[i];
 
-                            if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && grid[nr, nc] == '@')
+                            if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && grid[nr][nc] == '@')
                             {
                                 neighborCount++;
                             }
@@ -125,9 +122,9 @@ public static class Day04
             }
 
             totalRemoved += toRemove.Count;
-            foreach (var (r, c) in toRemove)
+            for (int i = 0; i < toRemove.Count; i++)
             {
-                grid[r, c] = '.'; // Remove the roll
+                grid[toRemove[i].r][toRemove[i].c] = '.'; // Remove the roll
             }
         }
 

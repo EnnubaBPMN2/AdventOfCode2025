@@ -10,16 +10,14 @@ pub fn part1(input: &str) -> i64 {
             continue;
         }
 
-        let digits: Vec<i64> = line.chars()
-            .filter_map(|c| c.to_digit(10))
-            .map(|d| d as i64)
-            .collect();
-        
+        let bytes = line.as_bytes();
         let mut max_joltage = -1;
 
-        for i in 0..digits.len() {
-            for j in (i + 1)..digits.len() {
-                let joltage = digits[i] * 10 + digits[j];
+        for i in 0..bytes.len() {
+            let digit_i = (bytes[i] - b'0') as i64;
+            for j in (i + 1)..bytes.len() {
+                let digit_j = (bytes[j] - b'0') as i64;
+                let joltage = digit_i * 10 + digit_j;
                 if joltage > max_joltage {
                     max_joltage = joltage;
                 }
@@ -45,14 +43,12 @@ pub fn part2(input: &str) -> i64 {
             continue;
         }
 
-        let digits: Vec<u32> = line.chars()
-            .filter_map(|c| c.to_digit(10))
-            .collect();
-        
-        let mut stack: Vec<u32> = Vec::new();
-        let n = digits.len();
+        let bytes = line.as_bytes();
+        let mut stack: Vec<u8> = Vec::with_capacity(k);
+        let n = bytes.len();
 
-        for (i, &digit) in digits.iter().enumerate() {
+        for i in 0..n {
+            let digit = bytes[i] - b'0';
             let remaining = n - 1 - i;
 
             while !stack.is_empty() && digit > *stack.last().unwrap() && stack.len() + remaining >= k {
@@ -64,12 +60,13 @@ pub fn part2(input: &str) -> i64 {
             }
         }
 
-        if stack.len() == k {
-            let number_str: String = stack.iter().map(|d| d.to_string()).collect();
-            if let Ok(val) = number_str.parse::<i64>() {
-                total_output_joltage += val;
-            }
+        // Construct the number directly from digits
+        let mut max_joltage: i64 = 0;
+        for &digit in &stack {
+            max_joltage = max_joltage * 10 + digit as i64;
         }
+
+        total_output_joltage += max_joltage;
     }
 
     total_output_joltage
