@@ -57,17 +57,25 @@ Select the day number when prompted. The solution will:
 1. Run the test input and verify against expected result
 2. Run your actual puzzle input (if available)
 
-#### Python
+#### Python (PyPy Recommended)
 
 ```powershell
 cd AocPython
+# Use PyPy for best performance (10-20x faster than CPython)
+pypy main.py
+
+# Or use regular Python if PyPy is not installed
 python main.py
 ```
 
-#### Rust
+#### Rust (Release Mode Recommended)
 
 ```powershell
 cd AocRust
+# Use release mode for best performance (10-100x faster than debug)
+cargo run --release
+
+# Or use debug mode for faster compilation during development
 cargo run
 ```
 
@@ -285,6 +293,99 @@ The test framework will:
 - [Python Documentation](https://docs.python.org/3/)
 - [Rust Documentation](https://doc.rust-lang.org/)
 
+## 🚄 Optimization Techniques
+
+This repository demonstrates modern performance optimization patterns across C#, Rust, and Python:
+
+### C# Optimizations
+
+- **Span<T> for zero-allocation parsing** - Use `AsSpan()` instead of `Substring()` to avoid string allocations
+  ```csharp
+  // ❌ Slow: Creates new string
+  var part = line.Substring(start, length);
+  int.Parse(part);
+
+  // ✅ Fast: Zero allocation
+  var span = line.AsSpan(start, length);
+  int.TryParse(span, out int value);
+  ```
+
+- **IndexOf() instead of Split()** - Avoid creating intermediate arrays
+  ```csharp
+  // ❌ Slow: Creates array
+  var parts = line.Split('-');
+
+  // ✅ Fast: Direct indexing
+  int dashIndex = line.IndexOf('-');
+  var before = line.AsSpan(0, dashIndex);
+  var after = line.AsSpan(dashIndex + 1);
+  ```
+
+- **Character arithmetic** - Direct digit conversion without parsing
+  ```csharp
+  // ❌ Slow: String allocation + parsing
+  int digit = int.Parse(c.ToString());
+
+  // ✅ Fast: Direct arithmetic
+  int digit = c - '0';
+  ```
+
+- **Jagged arrays over multidimensional** - Better memory locality
+  ```csharp
+  // ❌ Slower: Multidimensional
+  char[,] grid = new char[rows, cols];
+
+  // ✅ Faster: Jagged array
+  char[][] grid = new char[rows][];
+  ```
+
+### Rust Optimizations
+
+- **Byte slices over char slices** - More efficient for ASCII/UTF-8 operations
+  ```rust
+  // ❌ Slower: char operations
+  if line.chars().nth(i) == '@' { }
+
+  // ✅ Faster: byte operations
+  let bytes = line.as_bytes();
+  if bytes[i] == b'@' { }
+  ```
+
+- **find() instead of split()** - Avoid intermediate allocations
+  ```rust
+  // ❌ Slow: Creates vector
+  let parts: Vec<&str> = line.split('-').collect();
+
+  // ✅ Fast: Direct slicing
+  if let Some(pos) = line.find('-') {
+      let before = &line[..pos];
+      let after = &line[pos + 1..];
+  }
+  ```
+
+- **Unstable sorting** - When order stability doesn't matter
+  ```rust
+  // ❌ Slower: Stable sort (preserves equal element order)
+  vec.sort_by_key(|x| x.0);
+
+  // ✅ Faster: Unstable sort
+  vec.sort_unstable_by_key(|x| x.0);
+  ```
+
+### Python (PyPy) Optimizations
+
+- **PyPy over CPython** - JIT compilation for 10-20x speedup
+- **List comprehensions** - Faster than loops for simple operations
+- **Local variable caching** - Reduce attribute lookups in loops
+- **Built-in functions** - Use `sum()`, `max()`, etc. instead of manual loops
+
+### Cross-Language Patterns
+
+- **Eliminate LINQ/iterator overhead in hot paths** - Use manual loops for performance-critical code
+- **Pre-allocate collections** - Specify capacity when size is known
+- **Avoid repeated string operations** - Cache results, use builders/vectors
+- **Algorithm over micro-optimization** - Better algorithm > language speed
+
 ## ⚡ Performance Comparison
 
 Execution times for real puzzle inputs across all three language implementations (in seconds):
@@ -332,22 +433,25 @@ Execution times for real puzzle inputs across all three language implementations
 
 | Language | Total Time | Avg Time/Part | Wins |
 |----------|-----------|---------------|------|
-| **Rust** | 0.697s | 0.030s | 🥇 18/23 |
-| **C#** | 2.259s | 0.098s | 🥈 4/23 |
-| **PyPy** | 3.027s | 0.132s | 🥉 2/23 |
+| **Rust** | 0.586s | 0.025s | 🥇 16/23 |
+| **C#** | 2.005s | 0.087s | 🥈 9/23 |
+| **PyPy** | 2.943s | 0.128s | 🥉 0/23 |
 
 ### Key Observations
 
-- **Rust dominates** with the fastest total time (0.697s) and most individual wins (18/23) - **3.2x faster than C#**!
-- **Day 12 optimizations** were a game-changer - went from 20+ seconds to under 0.5s for C# (3.4x faster) and under 2s for Rust (12x faster)
-- **PyPy brings Python to competitive levels** - using PyPy's JIT compiler makes Python 18.7x faster on Day 12 (87s → 4.6s)
+- **Rust dominates** with the fastest total time (0.586s) and most individual wins (16/23) - **3.4x faster than C#**!
+- **C# optimization success** - Days 1-6 optimizations achieved 43-87% performance improvements, bringing C# competitive with Rust in many cases (9 wins vs previous 4)
+- **Zero-allocation techniques** were critical:
+  - C#: `AsSpan()` for substring operations, `IndexOf()` instead of `Split()`, character arithmetic (`c - '0'`)
+  - Rust: Byte slices (`&[u8]`), `find()` instead of `split().collect()`, direct digit construction
+  - Both: Jagged arrays over multidimensional, manual loops over LINQ/iterators for hot paths
+- **Day 12 optimizations** were a game-changer - precomputed shape orientations went from 20+ seconds to under 0.5s for C# (43x faster) and under 2s for Rust (12x faster)
+- **PyPy brings Python to competitive levels** - using PyPy's JIT compiler makes Python 18.7x faster on Day 12 (87s → 4.6s), though no individual wins
 - **Rust's release mode is critical** - `cargo run --release` provides 10-100x speedup over debug builds
-- **Precomputed shape orientations** were the key optimization for Day 12 across all languages - eliminating repeated computations in hot loops
-- **C# holds its own** with excellent JIT optimization, staying competitive despite Rust's native compilation advantage
-- **PyPy wins on Day 2** - JIT compilation shines on iterative arithmetic operations
-- **Day 8 shows PyPy's weakness** - Circuit simulation with complex logic benefits less from JIT, PyPy is 4.7x slower than Rust here
+- **C# now wins Days 2, 3, 5, 6 Part 2** after optimization - previously struggled with string allocations
+- **Day 8 shows PyPy's weakness** - Circuit simulation with complex logic benefits less from JIT, PyPy is 21x slower than Rust here
 - **Day 9 Part 2** demonstrates algorithm wins - Rust's 0.125s vs C#'s 1.103s (8.8x faster) shows low-level optimization benefits for complex backtracking
-- **All three languages are production-ready** for Advent of Code - even PyPy completes all 12 days in just over 3 seconds
+- **All three languages are production-ready** for Advent of Code - even PyPy completes all 12 days in under 3 seconds
 
 *Note: Times measured on Windows with .NET 10.0.101, PyPy 7.3+, and Rust 1.75+ (with `--release` flag). Python (CPython) is significantly slower; PyPy recommended for performance-critical code.*
 
