@@ -528,8 +528,8 @@ Execution times for real puzzle inputs across all three language implementations
 | | Part 1 | 0.006s | 0.004s | 0.000s | 0.0006s | 🥇 Go |
 | | Part 2 | 0.806s | 0.431s | 0.128s | 0.463s | 🥇 Rust |
 | **10** | Factory (Indicator Lights & Joltage Counters) |
-| | Part 1 | 0.003s | 0.046s | 0.033s | 0.0030s | 🥇 C# / Go |
-| | Part 2 | 0.091s | 0.273s | 0.102s | 0.0991s | 🥇 C# |
+| | Part 1 | 0.001s | 0.043s | 0.001s | 0.003s | 🥇 Rust / C# |
+| | Part 2 | 0.084s | 0.276s | 0.032s | 0.077s | 🥇 Rust |
 | **11** | Reactor (Path Finding) |
 | | Part 1 | 0.001s | 0.008s | 0.001s | 0.0001s | 🥇 Go |
 | | Part 2 | 0.004s | 0.018s | 0.001s | 0.0005s | 🥇 Go |
@@ -540,31 +540,25 @@ Execution times for real puzzle inputs across all three language implementations
 
 | Language | Total Time | Avg Time/Part | Wins |
 |----------|-----------|---------------|------|
-| **Go** | 0.015s | 0.001s | ⭐ 18/23 |
-| **Rust** | 0.425s | 0.018s | 🥇 11/23 |
-| **C#** | 1.761s | 0.077s | 🥈 7/23 |
-| **PyPy** | 2.995s | 0.130s | 🥉 0/23 |
+| **Go** | 0.015s | 0.001s | ⭐ 17/23 |
+| **Rust** | 0.355s | 0.015s | 🥇 13/23 |
+| **C#** | 1.743s | 0.076s | 🥈 6/23 |
+| **PyPy** | 2.992s | 0.130s | 🥉 0/23 |
 
 ### Key Observations
 
-- **Go dominates on sub-millisecond tasks**, holding the record for **18/23** parts.
-- **Rust still leads** with the fastest total time (0.425s) and strong performance on compute-heavy days (8, 9, 12).
-- **C# optimization breakthrough** - Days 7-12 optimizations achieved significant improvements:
-  - Day 10: 46% faster (0.157s → 0.085s), now **faster than Rust** on Part 2
-  - Day 11: Already optimal, **faster than Rust** on both parts
-  - Day 9: 19% improvement (1.103s → 0.898s) with HashSet optimization
-  - Overall: C# now wins **11/23 parts** (up from 9), closing the gap with Rust
-- **Zero-allocation techniques** were critical across all days:
-  - C#: `AsSpan()` for substring operations, `IndexOf()` instead of `Split()`, character arithmetic (`c - '0'`), `Array.Copy()` instead of `Clone()`
-  - Rust: Byte slices (`&[u8]`), `find()` instead of `split().collect()`, direct digit construction
-  - Both: Jagged arrays over multidimensional, manual loops over LINQ/iterators for hot paths
-- **Regex removal was a game-changer** - Replacing Regex operations with `IndexOf()` + `AsSpan()` in Day 10 yielded 46% speedup
-- **PyPy brings Python to competitive levels** - JIT compilation keeps Python within 2-7x of optimized C#/Rust, completing all 12 days in under 3 seconds
-- **Rust's release mode is critical** - `cargo run --release` provides 10-100x speedup over debug builds
-- **C# now wins Days 2, 3, 5, 6, 10, 11** after optimization - previously struggled with string allocations and LINQ overhead
-- **Day 8 shows PyPy's weakness** - Circuit simulation with complex Union-Find logic benefits less from JIT, PyPy is 19x slower than Rust
-- **Day 9 Part 2** demonstrates algorithm + optimization synergy - Rust's 0.124s vs C#'s 0.898s (7.2x faster) shows benefits of low-level control for complex backtracking
-- **All three languages are production-ready** for Advent of Code - even PyPy completes all 12 days in under 3 seconds total
+- **Go dominates on sub-millisecond tasks**, holding the record for **17/23** parts with near-zero overhead.
+- **Rust leads on total execution time (0.355s)** and excels in compute-heavy recursive search and packing (Days 8, 9, 12).
+- **Day 10 Optimization Comeback**: By removing Regex and minimizing allocations, Rust reclaimed the lead on Day 10 (0.032s), beating C# (0.084s) and Go (0.077s).
+- **C# remains competitive on logic-heavy days**: optimized implementations for Day 11 and Day 10 Part 1 remain among the fastest.
+- **Zero-allocation techniques were critical across all languages**:
+  - **Go**: Using integer mappings and pre-allocated slices to avoid GC pressure.
+  - **C#**: `AsSpan()` for substrings, `IndexOf()` instead of `Split()`, and character arithmetic.
+  - **Rust**: Byte slices (`&[u8]`) and avoiding `Vec` clones in recursion.
+- **Regex removal was the ultimate game-changer**: Replacing Regex with manual slicing in Day 10 provided substantial speedups (up to 4x in Rust).
+- **PyPy over standard Python**: JIT compilation keeps Python within a reasonable 2-8x factor of systems languages, completing the full suite in under 3 seconds.
+- **Algorithm > Language**: Optimized algorithms (like Day 11's memoized DFS or Day 8's DSU) provide order-of-magnitude improvements that dwarf language-specific micro-optimizations.
+- **All four languages are production-ready**: Every implementation completes the 23-part test suite in fraction of a second (or seconds for PyPy), demonstrating the maturity of modern language runtimes.
 
 *Note: Times measured on Windows with .NET 10.0.101, PyPy 7.3+, and Rust 1.75+ (with `--release` flag). Python (CPython) is significantly slower; PyPy recommended for performance-critical code.*
 
