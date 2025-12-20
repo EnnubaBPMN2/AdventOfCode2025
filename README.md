@@ -7,36 +7,101 @@ Multi-language solution repository for [Advent of Code 2025](https://adventofcod
 ```text
 AdventOfCode2025
 ├── AdventOfCode2025.sln
-├── inputs
+├── docs/                        # 📚 Problem descriptions and documentation
+│   └── problems/
+│       ├── day01.md             # Day 1: Secret Entrance
+│       ├── day02.md             # Day 2: Gift Shop
+│       ├── day03.md             # Day 3: Lobby
+│       ├── day04.md             # Day 4: Printing Department
+│       ├── day05.md             # Day 5: Cafeteria
+│       ├── day06.md             # Day 6: Trash Compactor
+│       ├── day07.md             # Day 7: Laboratories
+│       ├── day08.md             # Day 8: Playground
+│       ├── day09.md             # Day 9: Movie Theater
+│       ├── day10.md             # Day 10: Factory
+│       ├── day11.md             # Day 11: Reactor
+│       └── day12.md             # Day 12: Christmas Tree Farm
+├── inputs/                      # 📥 Puzzle inputs (shared across all languages)
 │   ├── day01.txt
-│   └── day01_test.txt
-├── AocCsharp
+│   ├── day01_test.txt
+│   ├── day02.txt
+│   └── ...
+├── AocCsharp/                   # 🔷 C# implementations
 │   ├── AocCsharp.csproj
 │   ├── Program.cs
-│   ├── Day01
+│   ├── Day01/
 │   │   └── Day01.cs
-│   └── Utils
+│   └── Utils/
 │       ├── InputReader.cs
 │       └── TestRunner.cs
-├── AocPython
+├── AocPython/                   # 🐍 Python implementations
 │   ├── main.py
-│   ├── day01
+│   ├── day01/
 │   │   ├── __init__.py
 │   │   └── solution.py
-│   └── utils
+│   └── utils/
 │       ├── __init__.py
 │       └── input_reader.py
-└── AocRust
+└── AocRust/                     # 🦀 Rust implementations
     ├── Cargo.toml
-    ├── src
+    ├── src/
     │   ├── main.rs
-    │   ├── day01
+    │   ├── day01/
     │   │   └── mod.rs
-    │   └── utils
+    │   └── utils/
     │       └── mod.rs
 ```
 
-## 🚀 Getting Started
+## � Documentation
+
+### Problem Descriptions
+
+All Advent of Code 2025 problem descriptions are stored in the `docs/problems/` directory as markdown files. Each day's problem is self-contained and includes:
+
+- **Full problem statement** for both Part 1 and Part 2
+- **Example inputs and outputs** with explanations
+- **Your puzzle answers** for verification
+- **Completion status** (⭐⭐ when both parts are complete)
+
+**Location**: [`docs/problems/`](docs/problems/)
+
+**Files**:
+- `day01.md` - Day 1: Secret Entrance
+- `day02.md` - Day 2: Gift Shop  
+- `day03.md` - Day 3: Lobby
+- `day04.md` - Day 4: Printing Department
+- `day05.md` - Day 5: Cafeteria
+- `day06.md` - Day 6: Trash Compactor
+- `day07.md` - Day 7: Laboratories
+- `day08.md` - Day 8: Playground
+- `day09.md` - Day 9: Movie Theater
+- `day10.md` - Day 10: Factory
+- `day11.md` - Day 11: Reactor
+- `day12.md` - Day 12: Christmas Tree Farm
+
+**Why centralized documentation?**
+- **Language-agnostic**: Problem descriptions are the same regardless of implementation language
+- **Easy reference**: All problem statements in one location
+- **No duplication**: Avoid maintaining multiple copies across C#, Python, and Rust projects
+- **Clean separation**: Keeps "what we're solving" separate from "how we solve it"
+
+### Architecture Overview
+
+The solution follows a three-tier architecture:
+
+```
+📚 Documentation Layer (docs/)
+    ↓
+📥 Data Layer (inputs/)
+    ↓
+💻 Implementation Layer (AocCsharp, AocPython, AocRust)
+```
+
+- **Documentation** (`docs/problems/`) contains the problem statements
+- **Data** (`inputs/`) contains the centralized puzzle inputs (shared across all languages)
+- **Implementations** solve the problems in their respective languages, all referencing the same inputs
+
+## �🚀 Getting Started
 
 ### Prerequisites
 
