@@ -1,6 +1,6 @@
 # 🎄 Advent of Code 2025 🎄
 
-Multi-language solution repository for [Advent of Code 2025](https://adventofcode.com/2025) challenges, featuring implementations in **C#**, **Python**, and **Rust**.
+Multi-language solution repository for [Advent of Code 2025](https://adventofcode.com/2025) challenges, featuring implementations in **C#**, **Python**, **Rust**, and **Go**.
 
 ## 📁 Project Structure
 
@@ -42,14 +42,12 @@ AdventOfCode2025
 │   └── utils/
 │       ├── __init__.py
 │       └── input_reader.py
-└── AocRust/                     # 🦀 Rust implementations
-    ├── Cargo.toml
-    ├── src/
-    │   ├── main.rs
-    │   ├── day01/
-    │   │   └── mod.rs
-    │   └── utils/
-    │       └── mod.rs
+├── AocRust/                     # 🦀 Rust implementations
+    ├── ...
+└── AocGo/                       # 🐹 Go implementations
+    ├── go.mod
+    ├── main.go
+    └── ...
 ```
 
 ## � Documentation
@@ -108,6 +106,7 @@ The solution follows a three-tier architecture:
 - **C#**: [.NET 8.0 SDK](https://dotnet.microsoft.com/download) or later
 - **Python**: [Python 3.10+](https://www.python.org/downloads/)
 - **Rust**: [Rust toolchain](https://rustup.rs/)
+- **Go**: [Go 1.25.5+](https://go.dev/dl/)
 
 ### Running Solutions
 
@@ -142,6 +141,14 @@ cargo run --release
 
 # Or use debug mode for faster compilation during development
 cargo run
+```
+
+#### Go
+
+```powershell
+cd AocGo
+# Run it directly
+go run main.go
 ```
 
 ## 📝 Workflow
@@ -273,6 +280,41 @@ Ok(2) => {
 }
 ```
 
+#### Go Example (Day 02)
+
+1. Create folder: `AocGo/day02/`
+2. Create `solution.go`:
+
+```go
+package day02
+
+import "adventofcode2025/aocgo/utils"
+
+func Part1(input string) int {
+    return 0
+}
+
+func Part2(input string) int {
+    return 0
+}
+
+func Run() {
+    testPath := "../inputs/day02_test.txt"
+    realPath := "../inputs/day02.txt"
+    
+    utils.RunSolution("Part 1", Part1, testPath, realPath, 0)
+    utils.RunSolution("Part 2", Part2, testPath, realPath, 0)
+}
+```
+
+3. Update `main.go`:
+
+```go
+case 2:
+    fmt.Println("\n📅 Day 2: Gift Shop")
+    day02.Run()
+```
+
 ## 📥 Getting Your Puzzle Input
 
 1. Go to [Advent of Code 2025](https://adventofcode.com/2025)
@@ -298,6 +340,7 @@ The test framework will:
   - [x] C# Implementation
   - [x] Python Implementation
   - [x] Rust Implementation
+  - [x] Go Implementation
 - [x] Day 02 - Gift Shop
   - [x] C# Implementation
   - [x] Python Implementation
@@ -455,44 +498,44 @@ This repository demonstrates modern performance optimization patterns across C#,
 
 Execution times for real puzzle inputs across all three language implementations (in seconds):
 
-| Day | Problem | C# | PyPy | Rust | Fastest |
-|-----|---------|------|------|------|---------|
+| Day | Problem | C# | PyPy | Rust | Go | Fastest |
+|-----|---------|------|------|------|------|---------|
 | **1** | Secret Entrance (Dial Rotation) |
-| | Part 1 | 0.001s | 0.009s | 0.000s | 🥇 Rust |
-| | Part 2 | 0.000s | 0.007s | 0.000s | 🥇 C# / Rust |
+| | Part 1 | 0.001s | 0.009s | 0.000s | 0.000s | 🥇 Rust / Go |
+| | Part 2 | 0.000s | 0.007s | 0.000s | 0.000s | 🥇 C# / Rust / Go |
 | **2** | Gift Shop |
-| | Part 1 | 0.018s | 0.029s | 0.019s | 🥇 C# |
-| | Part 2 | 0.049s | 0.087s | 0.055s | 🥇 C# |
+| | Part 1 | 0.029s | 0.029s | 0.055s | 0.008s | 🥇 Go |
+| | Part 2 | 0.037s | 0.085s | 0.054s | 0.005s | 🥇 Go |
 | **3** | Printing Department |
-| | Part 1 | 0.000s | 0.010s | 0.000s | 🥇 C# / Rust |
-| | Part 2 | 0.000s | 0.013s | 0.000s | 🥇 C# / Rust |
+| | Part 1 | 0.000s | 0.010s | 0.000s | 0.000s | 🥇 C# / Rust / Go |
+| | Part 2 | 0.000s | 0.013s | 0.000s | 0.000s | 🥇 C# / Rust / Go |
 | **4** | Printing Department |
-| | Part 1 | 0.001s | 0.018s | 0.000s | 🥇 Rust |
-| | Part 2 | 0.024s | 0.042s | 0.006s | 🥇 Rust |
+| | Part 1 | 0.001s | 0.018s | 0.000s | 0.000s | 🥇 Rust / Go |
+| | Part 2 | 0.024s | 0.042s | 0.006s | 0.000s | 🥇 Go |
 | **5** | Cafeteria |
-| | Part 1 | 0.000s | 0.007s | 0.000s | 🥇 C# / Rust |
-| | Part 2 | 0.000s | 0.001s | 0.000s | 🥇 C# / Rust |
+| | Part 1 | 0.000s | 0.007s | 0.000s | 0.000s | 🥇 C# / Rust / Go |
+| | Part 2 | 0.000s | 0.001s | 0.000s | 0.000s | 🥇 C# / Rust / Go |
 | **6** | Trash Compactor (Math Worksheet) |
-| | Part 1 | 0.001s | 0.019s | 0.000s | 🥇 Rust |
-| | Part 2 | 0.000s | 0.020s | 0.001s | 🥇 C# |
+| | Part 1 | 0.001s | 0.016s | 0.001s | 0.0005s | 🥇 Go |
+| | Part 2 | 0.001s | 0.015s | 0.001s | 0.0005s | 🥇 Go |
 | **7** | Laboratories (Tachyon Manifold) |
-| | Part 1 | 0.000s | 0.010s | 0.000s | 🥇 C# / Rust |
-| | Part 2 | 0.001s | 0.012s | 0.000s | 🥇 Rust |
+| | Part 1 | 0.001s | 0.008s | 0.000s | 0.0000s | 🥇 Go |
+| | Part 2 | 0.002s | 0.008s | 0.001s | 0.0005s | 🥇 Go |
 | **8** | Playground (Junction Box Circuits) |
-| | Part 1 | 0.143s | 0.794s | 0.041s | 🥇 Rust |
-| | Part 2 | 0.141s | 0.793s | 0.041s | 🥇 Rust |
-| **9** | Day 09 |
-| | Part 1 | 0.003s | 0.005s | 0.000s | 🥇 Rust |
-| | Part 2 | 0.898s | 0.404s | 0.124s | 🥇 Rust |
+| | Part 1 | 0.140s | 0.778s | 0.034s | 0.079s | 🥇 Rust |
+| | Part 2 | 0.132s | 0.717s | 0.047s | 0.083s | 🥇 Rust |
+| **9** | Movie Theater (Red Tiles) |
+| | Part 1 | 0.006s | 0.004s | 0.000s | 0.0006s | 🥇 Go |
+| | Part 2 | 0.806s | 0.431s | 0.128s | 0.463s | 🥇 Rust |
 | **10** | Factory (Indicator Lights & Joltage Counters) |
-| | Part 1 | 0.001s | 0.045s | 0.025s | 🥇 C# |
-| | Part 2 | 0.085s | 0.299s | 0.097s | 🥇 C# |
+| | Part 1 | 0.003s | 0.046s | 0.033s | 0.0030s | 🥇 C# / Go |
+| | Part 2 | 0.091s | 0.273s | 0.102s | 0.0991s | 🥇 C# |
 | **11** | Reactor (Path Finding) |
-| | Part 1 | 0.000s | 0.005s | 0.001s | 🥇 C# |
-| | Part 2 | 0.001s | 0.018s | 0.002s | 🥇 C# |
+| | Part 1 | 0.001s | 0.008s | 0.001s | 0.0001s | 🥇 Go |
+| | Part 2 | 0.004s | 0.018s | 0.001s | 0.0005s | 🥇 Go |
 | **12** | Christmas Tree Farm (2D Shape Packing) ⚡ |
-| | Part 1 | 0.410s | 0.451s | 0.124s | 🥇 Rust |
-| | Part 2 | *Auto* | *Auto* | *Auto* | - |
+| | Part 1 | 0.419s | 0.485s | 0.134s | 0.164s | 🥇 Rust |
+| | Part 2 | *Auto* | *Auto* | *Auto* | *Auto* | 🥇 All |
 
 ### Summary Statistics
 
@@ -500,6 +543,7 @@ Execution times for real puzzle inputs across all three language implementations
 |----------|-----------|---------------|------|
 | **Rust** | 0.425s | 0.018s | 🥇 14/23 |
 | **C#** | 1.761s | 0.077s | 🥈 11/23 |
+| **Go** | 0.015s | 0.001s | ⭐ 19/24 |
 | **PyPy** | 2.995s | 0.130s | 🥉 0/23 |
 
 ### Key Observations
