@@ -18,7 +18,12 @@
       "Bash(timeout 120 dotnet run:*)",
       "Bash(cat:*)",
       "Bash(timeout 60 bash:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(find:*)",
+      "Bash(git rm:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git ls-files:*)"
     ],
     "deny": [],
     "ask": []
