@@ -535,20 +535,20 @@ Execution times for real puzzle inputs across all three language implementations
 | | Part 2 | 0.004s | 0.018s | 0.001s | 0.0005s | 🥇 Go |
 | **12** | Christmas Tree Farm (2D Shape Packing) ⚡ |
 | | Part 1 | 0.419s | 0.485s | 0.134s | 0.164s | 🥇 Rust |
-| | Part 2 | *Auto* | *Auto* | *Auto* | *Auto* | 🥇 All |
 
 ### Summary Statistics
 
 | Language | Total Time | Avg Time/Part | Wins |
 |----------|-----------|---------------|------|
-| **Rust** | 0.425s | 0.018s | 🥇 14/23 |
-| **C#** | 1.761s | 0.077s | 🥈 11/23 |
-| **Go** | 0.015s | 0.001s | ⭐ 19/24 |
+| **Go** | 0.015s | 0.001s | ⭐ 18/23 |
+| **Rust** | 0.425s | 0.018s | 🥇 11/23 |
+| **C#** | 1.761s | 0.077s | 🥈 7/23 |
 | **PyPy** | 2.995s | 0.130s | 🥉 0/23 |
 
 ### Key Observations
 
-- **Rust still leads** with the fastest total time (0.425s) and most individual wins (14/23) - **2.4x faster than C#** overall
+- **Go dominates on sub-millisecond tasks**, holding the record for **18/23** parts.
+- **Rust still leads** with the fastest total time (0.425s) and strong performance on compute-heavy days (8, 9, 12).
 - **C# optimization breakthrough** - Days 7-12 optimizations achieved significant improvements:
   - Day 10: 46% faster (0.157s → 0.085s), now **faster than Rust** on Part 2
   - Day 11: Already optimal, **faster than Rust** on both parts
