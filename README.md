@@ -72,6 +72,7 @@ All Advent of Code 2025 problem descriptions are stored in the `docs/problems/` 
 **Location**: [`docs/problems/`](docs/problems/)
 
 **Files**:
+
 - `day01.md` - Day 1: Secret Entrance
 - `day02.md` - Day 2: Gift Shop  
 - `day03.md` - Day 3: Lobby
@@ -86,6 +87,7 @@ All Advent of Code 2025 problem descriptions are stored in the `docs/problems/` 
 - `day12.md` - Day 12: Christmas Tree Farm
 
 **Why centralized documentation?**
+
 - **Language-agnostic**: Problem descriptions are the same regardless of implementation language
 - **Easy reference**: All problem statements in one location
 - **No duplication**: Avoid maintaining multiple copies across C#, Python, and Rust projects
@@ -128,6 +130,7 @@ dotnet run
 ```
 
 Select the day number when prompted. The solution will:
+
 1. Run the test input and verify against expected result
 2. Run your actual puzzle input (if available)
 
@@ -255,7 +258,7 @@ def run():
     solution_root = os.path.dirname(os.path.dirname(day_dir))
     test_input_path = os.path.join(solution_root, "inputs", "day02_test.txt")
     real_input_path = os.path.join(solution_root, "inputs", "day02.txt")
-    
+
     run_solution("Part 1", part1, test_input_path, real_input_path, expected_test_result=0)
     run_solution("Part 2", part2, test_input_path, real_input_path, expected_test_result=0)
 ```
@@ -327,7 +330,7 @@ func Part2(input string) int {
 func Run() {
     testPath := "../inputs/day02_test.txt"
     realPath := "../inputs/day02.txt"
-    
+
     utils.RunSolution("Part 1", Part1, testPath, realPath, 0)
     utils.RunSolution("Part 2", Part2, testPath, realPath, 0)
 }
@@ -352,10 +355,12 @@ case 2:
 ## ✅ Testing
 
 Each solution automatically runs against:
+
 - **Test Input**: Example from the problem description with known expected result
 - **Real Input**: Your actual puzzle input from adventofcode.com
 
 The test framework will:
+
 - ✓ Show PASSED if test matches expected result
 - ✗ Show FAILED if test doesn't match
 - Display the actual result for your puzzle input
@@ -469,21 +474,23 @@ This repository demonstrates modern performance optimization patterns across C#,
 ### C# Optimizations
 
 - **Span<T> for zero-allocation parsing** - Use `AsSpan()` instead of `Substring()` to avoid string allocations
+  
   ```csharp
   // ❌ Slow: Creates new string
   var part = line.Substring(start, length);
   int.Parse(part);
-
+  
   // ✅ Fast: Zero allocation
   var span = line.AsSpan(start, length);
   int.TryParse(span, out int value);
   ```
 
 - **IndexOf() instead of Split()** - Avoid creating intermediate arrays
+  
   ```csharp
   // ❌ Slow: Creates array
   var parts = line.Split('-');
-
+  
   // ✅ Fast: Direct indexing
   int dashIndex = line.IndexOf('-');
   var before = line.AsSpan(0, dashIndex);
@@ -491,19 +498,21 @@ This repository demonstrates modern performance optimization patterns across C#,
   ```
 
 - **Character arithmetic** - Direct digit conversion without parsing
+  
   ```csharp
   // ❌ Slow: String allocation + parsing
   int digit = int.Parse(c.ToString());
-
+  
   // ✅ Fast: Direct arithmetic
   int digit = c - '0';
   ```
 
 - **Jagged arrays over multidimensional** - Better memory locality
+  
   ```csharp
   // ❌ Slower: Multidimensional
   char[,] grid = new char[rows, cols];
-
+  
   // ✅ Faster: Jagged array
   char[][] grid = new char[rows][];
   ```
@@ -511,20 +520,22 @@ This repository demonstrates modern performance optimization patterns across C#,
 ### Rust Optimizations
 
 - **Byte slices over char slices** - More efficient for ASCII/UTF-8 operations
+  
   ```rust
   // ❌ Slower: char operations
   if line.chars().nth(i) == '@' { }
-
+  
   // ✅ Faster: byte operations
   let bytes = line.as_bytes();
   if bytes[i] == b'@' { }
   ```
 
 - **find() instead of split()** - Avoid intermediate allocations
+  
   ```rust
   // ❌ Slow: Creates vector
   let parts: Vec<&str> = line.split('-').collect();
-
+  
   // ✅ Fast: Direct slicing
   if let Some(pos) = line.find('-') {
       let before = &line[..pos];
@@ -533,10 +544,11 @@ This repository demonstrates modern performance optimization patterns across C#,
   ```
 
 - **Unstable sorting** - When order stability doesn't matter
+  
   ```rust
   // ❌ Slower: Stable sort (preserves equal element order)
   vec.sort_by_key(|x| x.0);
-
+  
   // ✅ Faster: Unstable sort
   vec.sort_unstable_by_key(|x| x.0);
   ```
@@ -559,55 +571,55 @@ This repository demonstrates modern performance optimization patterns across C#,
 
 Execution times for real puzzle inputs across all six language implementations (in seconds):
 
-| Day | Problem | C# | TypeScript | JavaScript | Rust | Go | PyPy | Fastest |
-|-----|---------|------|------------|------------|------|------|------|---------|
-| **1** | Secret Entrance (Dial Rotations & Zeros) |
-| | Part 1 | 0.003s | 0.001s | 0.002s | 0.001s | 0.0003s | 0.008s | 🥇 Go |
-| | Part 2 | 0.010s | 0.001s | 0.002s | 0.004s | 0.0013s | 0.038s | 🥇 Go |
-| **2** | Gift Shop (Range Parsing & Pattern Check) |
-| | Part 1 | 0.010s | 0.031s | 0.012s | 0.000s | 0.0021s | 0.011s | 🥇 Rust |
-| | Part 2 | 0.009s | 0.026s | 0.006s | 0.001s | 0.0022s | 0.013s | 🥇 Rust |
-| **3** | Lobby (Monotonic Subsequences) |
-| | Part 1 | 0.003s | 0.003s | 0.001s | 0.000s | 0.0001s | 0.001s | 🥇 Go |
-| | Part 2 | 0.003s | 0.001s | 0.002s | 0.001s | 0.0001s | 0.001s | 🥇 Go |
-| **4** | Printing Department (Grid Neighbors & Cascading Removal) |
-| | Part 1 | 0.001s | 0.003s | 0.002s | 0.000s | 0.0005s | 0.023s | 🥇 Go |
-| | Part 2 | 0.008s | 0.006s | 0.004s | 0.001s | 0.0009s | 0.016s | 🥇 Go |
-| **5** | Cafeteria (ID Verification & Matching Sets) |
-| | Part 1 | 0.001s | 0.001s | 0.001s | 0.000s | 0.0001s | 0.001s | 🥇 Go |
-| | Part 2 | 0.000s | 0.000s | 0.000s | 0.000s | 0.0000s | 0.000s | 🥇 Go |
-| **6** | Trash Compactor (Math Worksheet Parsing) |
-| | Part 1 | 0.000s | 0.002s | 0.002s | 0.000s | 0.0006s | 0.003s | 🥇 C# / Go |
-| | Part 2 | 0.000s | 0.002s | 0.001s | 0.000s | 0.0006s | 0.003s | 🥇 C# / Go |
-| **7** | Laboratories (Tachyon Manifold) |
-| | Part 1 | 0.000s | 0.001s | 0.000s | 0.000s | 0.0000s | 0.008s | 🥇 C# / Go / JS |
-| | Part 2 | 0.002s | 0.003s | 0.001s | 0.001s | 0.0005s | 0.008s | 🥇 Go |
-| **8** | Playground (Junction Box Circuits) |
-| | Part 1 | 0.156s | 0.808s | 0.205s | 0.034s | 0.079s | 0.778s | 🥇 Rust |
-| | Part 2 | 0.126s | 0.734s | 0.172s | 0.047s | 0.083s | 0.717s | 🥇 Go |
-| **9** | Movie Theater (Red Tiles) |
-| | Part 1 | 0.002s | 0.002s | 0.002s | 0.000s | 0.0006s | 0.004s | 🥇 Go |
-| | Part 2 | 1.199s | 0.473s | 0.392s | 0.128s | 0.463s | 0.431s | 🥇 Rust |
-| **10** | Factory (Indicator Lights & Joltage Counters) |
-| | Part 1 | 0.003s | 0.006s | 0.005s | 0.001s | 0.003s | 0.043s | 🥇 Go |
-| | Part 2 | 0.093s | 0.395s | 0.162s | 0.032s | 0.077s | 0.276s | 🥇 Rust |
-| **11** | Reactor (Path Finding) |
-| | Part 1 | 0.000s | 0.003s | 0.001s | 0.001s | 0.0001s | 0.008s | 🥇 Go |
-| | Part 2 | 0.002s | 0.003s | 0.001s | 0.001s | 0.0005s | 0.018s | 🥇 Go |
-| **12** | Christmas Tree Farm (2D Shape Packing) ⚡ |
-| | Part 1 | 0.408s | 0.758s | 0.397s | 0.134s | 0.164s | 0.485s | 🥇 Rust |
-| | Part 2 | (Auto) | (Auto) | (Auto) | (Auto) | (Auto) | (Auto) | ✅ |
+| Day    | Problem                                                  | C#     | TypeScript | JavaScript | Rust   | Go      | PyPy   | Fastest         |
+| ------ | -------------------------------------------------------- | ------ | ---------- | ---------- | ------ | ------- | ------ | --------------- |
+| **1**  | Secret Entrance (Dial Rotations & Zeros)                 |        |            |            |        |         |        |                 |
+|        | Part 1                                                   | 0.003s | 0.001s     | 0.002s     | 0.001s | 0.0003s | 0.008s | 🥇 Go           |
+|        | Part 2                                                   | 0.010s | 0.001s     | 0.002s     | 0.004s | 0.0013s | 0.038s | 🥇 Go           |
+| **2**  | Gift Shop (Range Parsing & Pattern Check)                |        |            |            |        |         |        |                 |
+|        | Part 1                                                   | 0.010s | 0.031s     | 0.012s     | 0.000s | 0.0021s | 0.011s | 🥇 Rust         |
+|        | Part 2                                                   | 0.009s | 0.026s     | 0.006s     | 0.001s | 0.0022s | 0.013s | 🥇 Rust         |
+| **3**  | Lobby (Monotonic Subsequences)                           |        |            |            |        |         |        |                 |
+|        | Part 1                                                   | 0.003s | 0.003s     | 0.001s     | 0.000s | 0.0001s | 0.001s | 🥇 Go           |
+|        | Part 2                                                   | 0.003s | 0.001s     | 0.002s     | 0.001s | 0.0001s | 0.001s | 🥇 Go           |
+| **4**  | Printing Department (Grid Neighbors & Cascading Removal) |        |            |            |        |         |        |                 |
+|        | Part 1                                                   | 0.001s | 0.003s     | 0.002s     | 0.000s | 0.0005s | 0.023s | 🥇 Go           |
+|        | Part 2                                                   | 0.008s | 0.006s     | 0.004s     | 0.001s | 0.0009s | 0.016s | 🥇 Go           |
+| **5**  | Cafeteria (ID Verification & Matching Sets)              |        |            |            |        |         |        |                 |
+|        | Part 1                                                   | 0.001s | 0.001s     | 0.001s     | 0.000s | 0.0001s | 0.001s | 🥇 Go           |
+|        | Part 2                                                   | 0.000s | 0.000s     | 0.000s     | 0.000s | 0.0000s | 0.000s | 🥇 Go           |
+| **6**  | Trash Compactor (Math Worksheet Parsing)                 |        |            |            |        |         |        |                 |
+|        | Part 1                                                   | 0.000s | 0.002s     | 0.002s     | 0.000s | 0.0006s | 0.003s | 🥇 C# / Go      |
+|        | Part 2                                                   | 0.000s | 0.002s     | 0.001s     | 0.000s | 0.0006s | 0.003s | 🥇 C# / Go      |
+| **7**  | Laboratories (Tachyon Manifold)                          |        |            |            |        |         |        |                 |
+|        | Part 1                                                   | 0.000s | 0.001s     | 0.000s     | 0.000s | 0.0000s | 0.008s | 🥇 C# / Go / JS |
+|        | Part 2                                                   | 0.002s | 0.003s     | 0.001s     | 0.001s | 0.0005s | 0.008s | 🥇 Go           |
+| **8**  | Playground (Junction Box Circuits)                       |        |            |            |        |         |        |                 |
+|        | Part 1                                                   | 0.156s | 0.808s     | 0.205s     | 0.034s | 0.079s  | 0.778s | 🥇 Rust         |
+|        | Part 2                                                   | 0.126s | 0.734s     | 0.172s     | 0.047s | 0.083s  | 0.717s | 🥇 Go           |
+| **9**  | Movie Theater (Red Tiles)                                |        |            |            |        |         |        |                 |
+|        | Part 1                                                   | 0.002s | 0.002s     | 0.002s     | 0.000s | 0.0006s | 0.004s | 🥇 Go           |
+|        | Part 2                                                   | 1.199s | 0.473s     | 0.392s     | 0.128s | 0.463s  | 0.431s | 🥇 Rust         |
+| **10** | Factory (Indicator Lights & Joltage Counters)            |        |            |            |        |         |        |                 |
+|        | Part 1                                                   | 0.003s | 0.006s     | 0.005s     | 0.001s | 0.003s  | 0.043s | 🥇 Go           |
+|        | Part 2                                                   | 0.093s | 0.395s     | 0.162s     | 0.032s | 0.077s  | 0.276s | 🥇 Rust         |
+| **11** | Reactor (Path Finding)                                   |        |            |            |        |         |        |                 |
+|        | Part 1                                                   | 0.000s | 0.003s     | 0.001s     | 0.001s | 0.0001s | 0.008s | 🥇 Go           |
+|        | Part 2                                                   | 0.002s | 0.003s     | 0.001s     | 0.001s | 0.0005s | 0.018s | 🥇 Go           |
+| **12** | Christmas Tree Farm (2D Shape Packing) ⚡                 |        |            |            |        |         |        |                 |
+|        | Part 1                                                   | 0.408s | 0.758s     | 0.397s     | 0.134s | 0.164s  | 0.485s | 🥇 Rust         |
+|        | Part 2                                                   | (Auto) | (Auto)     | (Auto)     | (Auto) | (Auto)  | (Auto) | ✅               |
 
 ### Summary Statistics
 
-| Language | Total Time | Avg Time/Part | Wins |
-|----------|-----------|---------------|------|
-| **Go** | 0.015s | 0.001s | ⭐ 16/23 |
-| **Rust** | 0.355s | 0.015s | 🥇 13/23 |
-| **JavaScript** | 0.978s | 0.043s | 🥈 1/23 |
-| **C#** | 1.743s | 0.076s | 🥉 0/23 |
-| **PyPy** | 2.992s | 0.130s | 0/23 |
-| **TypeScript** | 3.054s | 0.133s | 0/23 |
+| Language       | Total Time | Avg Time/Part | Wins     |
+| -------------- | ---------- | ------------- | -------- |
+| **Go**         | 0.015s     | 0.001s        | ⭐ 16/23  |
+| **Rust**       | 0.355s     | 0.015s        | 🥇 13/23 |
+| **JavaScript** | 0.978s     | 0.043s        | 🥈 1/23  |
+| **C#**         | 1.743s     | 0.076s        | 🥉 0/23  |
+| **PyPy**       | 2.992s     | 0.130s        | 0/23     |
+| **TypeScript** | 3.054s     | 0.133s        | 0/23     |
 
 ### Key Observations
 
