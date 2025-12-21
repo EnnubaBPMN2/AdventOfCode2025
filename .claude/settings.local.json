@@ -23,7 +23,11 @@
       "Bash(git rm:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git ls-files:*)"
+      "Bash(git ls-files:*)",
+      "Bash(node --version:*)",
+      "Bash(timeout 30 node:*)",
+      "Bash(timeout 120 node:*)",
+      "Bash(tree:*)"
     ],
     "deny": [],
     "ask": []

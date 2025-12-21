@@ -1,6 +1,6 @@
 # 🎄 Advent of Code 2025 🎄
 
-Multi-language solution repository for [Advent of Code 2025](https://adventofcode.com/2025) challenges, featuring implementations in **C#**, **Python**, **Rust**, **Go**, and **TypeScript**.
+Multi-language solution repository for [Advent of Code 2025](https://adventofcode.com/2025) challenges, featuring implementations in **C#**, **Python**, **Rust**, **Go**, **TypeScript**, and **JavaScript**.
 
 ## 📁 Project Structure
 
@@ -48,9 +48,13 @@ AdventOfCode2025
 │   ├── go.mod
 │   ├── main.go
 │   └── ...
-└── AocTypeScript/               # ⚡ TypeScript implementations (Bun)
+├── AocTypeScript/               # ⚡ TypeScript implementations (Bun)
+│   ├── package.json
+│   ├── main.ts
+│   └── ...
+└── AocJavaScript/               # 💛 JavaScript implementations (Node.js)
     ├── package.json
-    ├── main.ts
+    ├── main.js
     └── ...
 ```
 
@@ -111,6 +115,8 @@ The solution follows a three-tier architecture:
 - **Python**: [Python 3.10+](https://www.python.org/downloads/)
 - **Rust**: [Rust toolchain](https://rustup.rs/)
 - **Go**: [Go 1.25.5+](https://go.dev/dl/)
+- **TypeScript**: [Bun runtime](https://bun.sh/)
+- **JavaScript**: [Node.js 18+](https://nodejs.org/)
 
 ### Running Solutions
 
@@ -153,6 +159,22 @@ cargo run
 cd AocGo
 # Run it directly
 go run main.go
+```
+
+#### TypeScript (Bun Runtime)
+
+```powershell
+cd AocTypeScript
+bun start
+```
+
+#### JavaScript (Node.js)
+
+```powershell
+cd AocJavaScript
+npm start
+# Or directly:
+node main.js
 ```
 
 ## 📝 Workflow
@@ -340,55 +362,90 @@ The test framework will:
 
 ## 🎯 Current Progress
 
-- [x] Day 01 - Secret Entrance (Dial Rotation)
+- [x] Day 01 - Secret Entrance (Dial Rotation) ⭐⭐
   - [x] C# Implementation
   - [x] Python Implementation
   - [x] Rust Implementation
   - [x] Go Implementation
-- [x] Day 02 - Gift Shop
+  - [x] TypeScript Implementation
+  - [x] JavaScript Implementation
+- [x] Day 02 - Gift Shop ⭐⭐
   - [x] C# Implementation
   - [x] Python Implementation
   - [x] Rust Implementation
-- [x] Day 03 - Printing Department
+  - [x] Go Implementation
+  - [x] TypeScript Implementation
+  - [x] JavaScript Implementation
+- [x] Day 03 - Lobby ⭐⭐
   - [x] C# Implementation
   - [x] Python Implementation
   - [x] Rust Implementation
-- [x] Day 04 - Printing Department
+  - [x] Go Implementation
+  - [x] TypeScript Implementation
+  - [x] JavaScript Implementation
+- [x] Day 04 - Printing Department ⭐⭐
   - [x] C# Implementation
   - [x] Python Implementation
   - [x] Rust Implementation
-- [x] Day 05 - Cafeteria
+  - [x] Go Implementation
+  - [x] TypeScript Implementation
+  - [x] JavaScript Implementation
+- [x] Day 05 - Cafeteria ⭐⭐
   - [x] C# Implementation
   - [x] Python Implementation
   - [x] Rust Implementation
-- [x] Day 06 - Trash Compactor (Math Worksheet)
+  - [x] Go Implementation
+  - [x] TypeScript Implementation
+  - [x] JavaScript Implementation
+- [x] Day 06 - Trash Compactor (Math Worksheet) ⭐⭐
   - [x] C# Implementation
   - [x] Python Implementation
   - [x] Rust Implementation
-- [x] Day 07 - Laboratories (Tachyon Manifold)
+  - [x] Go Implementation
+  - [x] TypeScript Implementation
+  - [x] JavaScript Implementation
+- [x] Day 07 - Laboratories (Tachyon Manifold) ⭐⭐
   - [x] C# Implementation
   - [x] Python Implementation
   - [x] Rust Implementation
-- [x] Day 08 - Playground (Junction Box Circuits)
+  - [x] Go Implementation
+  - [x] TypeScript Implementation
+  - [x] JavaScript Implementation
+- [x] Day 08 - Playground (Junction Box Circuits) ⭐⭐
   - [x] C# Implementation
   - [x] Python Implementation
   - [x] Rust Implementation
-- [x] Day 09 - Day 09
+  - [x] Go Implementation
+  - [x] TypeScript Implementation
+  - [x] JavaScript Implementation
+- [x] Day 09 - Movie Theater (Red Tiles) ⭐⭐
   - [x] C# Implementation
   - [x] Python Implementation
   - [x] Rust Implementation
-- [x] Day 10 - Factory (Indicator Lights & Joltage Counters)
+  - [x] Go Implementation
+  - [x] TypeScript Implementation
+  - [x] JavaScript Implementation
+- [x] Day 10 - Factory (Indicator Lights & Joltage Counters) ⭐⭐
   - [x] C# Implementation
   - [x] Python Implementation
   - [x] Rust Implementation
-- [x] Day 11 - Reactor (Path Finding)
+  - [x] Go Implementation
+  - [x] TypeScript Implementation
+  - [x] JavaScript Implementation
+- [x] Day 11 - Reactor (Path Finding) ⭐⭐
   - [x] C# Implementation
   - [x] Python Implementation
   - [x] Rust Implementation
-- [x] Day 12 - Christmas Tree Farm (2D Shape Packing)
+  - [x] Go Implementation
+  - [x] TypeScript Implementation
+  - [x] JavaScript Implementation
+- [x] Day 12 - Christmas Tree Farm (2D Shape Packing) ⭐
   - [x] C# Implementation
   - [x] Python Implementation
   - [x] Rust Implementation
+  - [x] Go Implementation
+  - [x] TypeScript Implementation
+  - [x] JavaScript Implementation
 
 ## 💡 Tips
 
@@ -500,73 +557,81 @@ This repository demonstrates modern performance optimization patterns across C#,
 
 ## ⚡ Performance Comparison
 
-Execution times for real puzzle inputs across all three language implementations (in seconds):
+Execution times for real puzzle inputs across all six language implementations (in seconds):
 
-| Day | Problem | C# | TypeScript | Rust | Go | PyPy | Fastest |
-|-----|---------|------|------------|------|------|------|---------|
+| Day | Problem | C# | TypeScript | JavaScript | Rust | Go | PyPy | Fastest |
+|-----|---------|------|------------|------------|------|------|------|---------|
 | **1** | Secret Entrance (Dial Rotations & Zeros) |
-| | Part 1 | 0.003s | 0.001s | 0.001s | 0.0003s | 0.008s | 🥇 Go |
-| | Part 2 | 0.010s | 0.001s | 0.004s | 0.0013s | 0.038s | 🥇 Go |
+| | Part 1 | 0.003s | 0.001s | 0.002s | 0.001s | 0.0003s | 0.008s | 🥇 Go |
+| | Part 2 | 0.010s | 0.001s | 0.002s | 0.004s | 0.0013s | 0.038s | 🥇 Go |
 | **2** | Gift Shop (Range Parsing & Pattern Check) |
-| | Part 1 | 0.010s | 0.011s | 0.000s | 0.0021s | 0.011s | 🥇 Rust |
-| | Part 2 | 0.009s | 0.012s | 0.001s | 0.0022s | 0.013s | 🥇 Rust |
+| | Part 1 | 0.010s | 0.031s | 0.012s | 0.000s | 0.0021s | 0.011s | 🥇 Rust |
+| | Part 2 | 0.009s | 0.026s | 0.006s | 0.001s | 0.0022s | 0.013s | 🥇 Rust |
 | **3** | Lobby (Monotonic Subsequences) |
-| | Part 1 | 0.003s | 0.001s | 0.000s | 0.0001s | 0.001s | 🥇 Go |
-| | Part 2 | 0.003s | 0.001s | 0.001s | 0.0001s | 0.001s | 🥇 Go |
+| | Part 1 | 0.003s | 0.003s | 0.001s | 0.000s | 0.0001s | 0.001s | 🥇 Go |
+| | Part 2 | 0.003s | 0.001s | 0.002s | 0.001s | 0.0001s | 0.001s | 🥇 Go |
 | **4** | Printing Department (Grid Neighbors & Cascading Removal) |
-| | Part 1 | 0.001s | 0.003s | 0.000s | 0.0005s | 0.023s | 🥇 Go |
-| | Part 2 | 0.008s | 0.006s | 0.001s | 0.0009s | 0.016s | 🥇 Go |
+| | Part 1 | 0.001s | 0.003s | 0.002s | 0.000s | 0.0005s | 0.023s | 🥇 Go |
+| | Part 2 | 0.008s | 0.006s | 0.004s | 0.001s | 0.0009s | 0.016s | 🥇 Go |
 | **5** | Cafeteria (ID Verification & Matching Sets) |
-| | Part 1 | 0.001s | 0.001s | 0.000s | 0.0001s | 0.001s | 🥇 Go |
-| | Part 2 | 0.000s | 0.000s | 0.000s | 0.0000s | 0.000s | 🥇 Go |
+| | Part 1 | 0.001s | 0.001s | 0.001s | 0.000s | 0.0001s | 0.001s | 🥇 Go |
+| | Part 2 | 0.000s | 0.000s | 0.000s | 0.000s | 0.0000s | 0.000s | 🥇 Go |
 | **6** | Trash Compactor (Math Worksheet Parsing) |
-| | Part 1 | 0.000s | 0.002s | 0.000s | 0.0006s | 0.003s | 🥇 C# / Go |
-| | Part 2 | 0.000s | 0.001s | 0.000s | 0.0006s | 0.003s | 🥇 C# / Go |
+| | Part 1 | 0.000s | 0.002s | 0.002s | 0.000s | 0.0006s | 0.003s | 🥇 C# / Go |
+| | Part 2 | 0.000s | 0.002s | 0.001s | 0.000s | 0.0006s | 0.003s | 🥇 C# / Go |
 | **7** | Laboratories (Tachyon Manifold) |
-| | Part 1 | 0.000s | 0.001s | 0.000s | 0.0000s | 0.008s | 🥇 C# / Go |
-| | Part 2 | 0.002s | 0.003s | 0.001s | 0.0005s | 0.008s | 🥇 Go |
+| | Part 1 | 0.000s | 0.001s | 0.000s | 0.000s | 0.0000s | 0.008s | 🥇 C# / Go / JS |
+| | Part 2 | 0.002s | 0.003s | 0.001s | 0.001s | 0.0005s | 0.008s | 🥇 Go |
 | **8** | Playground (Junction Box Circuits) |
-| | Part 1 | 0.156s | 0.783s | 0.034s | 0.079s | 0.778s | 🥇 Rust |
-| | Part 2 | 0.126s | 0.699s | 0.047s | 0.083s | 0.717s | 🥇 Go |
+| | Part 1 | 0.156s | 0.808s | 0.205s | 0.034s | 0.079s | 0.778s | 🥇 Rust |
+| | Part 2 | 0.126s | 0.734s | 0.172s | 0.047s | 0.083s | 0.717s | 🥇 Go |
 | **9** | Movie Theater (Red Tiles) |
-| | Part 1 | 0.002s | 0.001s | 0.000s | 0.0006s | 0.004s | 🥇 Go |
-| | Part 2 | 1.199s | 0.465s | 0.128s | 0.463s | 0.431s | 🥇 Rust |
+| | Part 1 | 0.002s | 0.002s | 0.002s | 0.000s | 0.0006s | 0.004s | 🥇 Go |
+| | Part 2 | 1.199s | 0.473s | 0.392s | 0.128s | 0.463s | 0.431s | 🥇 Rust |
 | **10** | Factory (Indicator Lights & Joltage Counters) |
-| | Part 1 | 0.003s | 0.007s | 0.001s | 0.003s | 0.043s | 🥇 Go |
-| | Part 2 | 0.093s | 0.399s | 0.032s | 0.077s | 0.276s | 🥇 Rust |
+| | Part 1 | 0.003s | 0.006s | 0.005s | 0.001s | 0.003s | 0.043s | 🥇 Go |
+| | Part 2 | 0.093s | 0.395s | 0.162s | 0.032s | 0.077s | 0.276s | 🥇 Rust |
 | **11** | Reactor (Path Finding) |
-| | Part 1 | 0.000s | 0.003s | 0.001s | 0.0001s | 0.008s | 🥇 Go |
-| | Part 2 | 0.002s | 0.003s | 0.001s | 0.0005s | 0.018s | 🥇 Go |
+| | Part 1 | 0.000s | 0.003s | 0.001s | 0.001s | 0.0001s | 0.008s | 🥇 Go |
+| | Part 2 | 0.002s | 0.003s | 0.001s | 0.001s | 0.0005s | 0.018s | 🥇 Go |
 | **12** | Christmas Tree Farm (2D Shape Packing) ⚡ |
-| | Part 1 | 0.408s | 0.717s | 0.134s | 0.164s | 0.485s | 🥇 Rust |
-| | Part 2 | (Auto) | (Auto) | (Auto) | (Auto) | (Auto) | ✅ |
+| | Part 1 | 0.408s | 0.758s | 0.397s | 0.134s | 0.164s | 0.485s | 🥇 Rust |
+| | Part 2 | (Auto) | (Auto) | (Auto) | (Auto) | (Auto) | (Auto) | ✅ |
 
 ### Summary Statistics
 
 | Language | Total Time | Avg Time/Part | Wins |
 |----------|-----------|---------------|------|
-| **Go** | 0.015s | 0.001s | ⭐ 17/23 |
+| **Go** | 0.015s | 0.001s | ⭐ 16/23 |
 | **Rust** | 0.355s | 0.015s | 🥇 13/23 |
-| **C#** | 1.743s | 0.076s | 🥈 6/23 |
-| **PyPy** | 2.992s | 0.130s | 🥉 0/23 |
-| **TypeScript** | 3.054s | 0.133s | 🥉 0/23 |
+| **JavaScript** | 0.978s | 0.043s | 🥈 1/23 |
+| **C#** | 1.743s | 0.076s | 🥉 0/23 |
+| **PyPy** | 2.992s | 0.130s | 0/23 |
+| **TypeScript** | 3.054s | 0.133s | 0/23 |
 
 ### Key Observations
 
-- **Go dominates on sub-millisecond tasks**, holding the record for **17/23** parts with near-zero overhead.
+- **Go dominates on sub-millisecond tasks**, holding the record for **16/23** parts with near-zero overhead.
 - **Rust leads on total execution time (0.355s)** and excels in compute-heavy recursive search and packing (Days 8, 9, 12).
+- **JavaScript (Node.js) outperforms TypeScript (Bun) significantly**: Node.js V8 engine achieves **0.978s total** vs Bun's **3.054s** (3.1x faster), demonstrating V8's superior optimization for compute-intensive workloads.
+- **JavaScript takes 3rd place overall**, beating C# (1.743s), PyPy (2.992s), and TypeScript (3.054s) with optimized V8 JIT compilation.
+- **Node.js excels on intensive computations**:
+  - **Day 8**: 4.7x faster than Bun (205ms vs 808ms)
+  - **Day 10 Part 2**: 2.4x faster than Bun (162ms vs 395ms)
+  - **Day 9 Part 2**: 1.2x faster than Bun (392ms vs 473ms)
 - **Day 10 Optimization Comeback**: By removing Regex and minimizing allocations, Rust reclaimed the lead on Day 10 (0.032s), beating C# (0.084s) and Go (0.077s).
 - **C# remains competitive on logic-heavy days**: optimized implementations for Day 11 and Day 10 Part 1 remain among the fastest.
 - **Zero-allocation techniques were critical across all languages**:
   - **Go**: Using integer mappings and pre-allocated slices to avoid GC pressure.
   - **C#**: `AsSpan()` for substrings, `IndexOf()` instead of `Split()`, and character arithmetic.
   - **Rust**: Byte slices (`&[u8]`) and avoiding `Vec` clones in recursion.
+  - **JavaScript/TypeScript**: Typed arrays (Uint8Array, BigInt64Array) and avoiding array allocations in hot paths.
 - **Regex removal was the ultimate game-changer**: Replacing Regex with manual slicing in Day 10 provided substantial speedups (up to 4x in Rust).
 - **PyPy over standard Python**: JIT compilation keeps Python within a reasonable 2-8x factor of systems languages, completing the full suite in under 3 seconds.
 - **Algorithm > Language**: Optimized algorithms (like Day 11's memoized DFS or Day 8's DSU) provide order-of-magnitude improvements that dwarf language-specific micro-optimizations.
-- **All five languages are production-ready**: Every implementation completes the 23-part test suite in fraction of a second (or seconds for TypeScript and PyPy), demonstrating the maturity of modern language runtimes.
+- **All six languages are production-ready**: Every implementation completes the 23-part test suite in fraction of a second (or seconds for interpreted languages), demonstrating the maturity of modern language runtimes.
 
-*Note: Times measured on Windows with .NET 10.0.101, PyPy 7.3+, and Rust 1.75+ (with `--release` flag). Python (CPython) is significantly slower; PyPy recommended for performance-critical code.*
+*Note: Times measured on Windows with .NET 10.0.101, Node.js v24.3.0, Bun 1.x, PyPy 7.3+, and Rust 1.75+ (with `--release` flag). Python (CPython) is significantly slower; PyPy recommended for performance-critical code.*
 
 ## 📄 License
 
