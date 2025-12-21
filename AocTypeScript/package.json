@@ -1,0 +1,12 @@
+{
+  "name": "aoc-typescript-2025",
+  "version": "1.0.0",
+  "module": "main.ts",
+  "type": "module",
+  "scripts": {
+    "start": "bun run main.ts"
+  },
+  "devDependencies": {
+    "bun-types": "latest"
+  }
+}
