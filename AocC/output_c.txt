@@ -1,0 +1,16 @@
+
+==================================================
+🎄 Advent of Code 2025 - C Solutions 🎄
+==================================================
+
+[36mSelect a day (1-25) or 0 to exit: [0m
+[33m=== Part 1 ===[0m
+[36mRunning Part 1 (Test)... [0m[32m✓ PASSED (Result: 7) [0.000s][0m
+[36mRunning Part 1 (Real Input)... [0m[32mResult: 422 [0.000s][0m
+
+[33m=== Part 2 ===[0m
+[36mRunning Part 2 (Test)... [0m[32m✓ PASSED (Result: 33) [0.000s][0m
+[36mRunning Part 2 (Real Input)... [0m[32mResult: 16361 [0.038s][0m
+
+[36mSelect a day (1-25) or 0 to exit: [0m
+[32m🎄 Happy Coding! 🎄[0m

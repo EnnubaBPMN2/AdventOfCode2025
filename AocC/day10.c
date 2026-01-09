@@ -289,13 +289,87 @@ static MachinePart2 parse_machine_part2(const char* line) {
     return m;
 }
 
+static void search_solutions(int free_var_idx, int num_free, int* free_vars, int64_t* current_sol, double matrix[100][101], int* pivot, int rows, int cols, int64_t* min_presses, int64_t max_target) {
+    if (free_var_idx == num_free) {
+        int64_t sol[100];
+        memcpy(sol, current_sol, sizeof(int64_t) * 100);
+        int64_t sum = 0;
+        for (int i = 0; i < num_free; i++) sum += sol[free_vars[i]];
+
+        bool valid = true;
+        for (int r = rows - 1; r >= 0; r--) {
+            if (pivot[r] == -1) {
+                // Consistency check for non-pivot rows
+                double val = matrix[r][cols];
+                for (int i = 0; i < num_free; i++) {
+                    int c = free_vars[i];
+                    if (fabs(matrix[r][c]) > 1e-9) val -= matrix[r][c] * sol[c];
+                }
+                if (fabs(val) > 1e-9) {
+                    valid = false;
+                    break;
+                }
+                continue;
+            }
+
+            int p_col = pivot[r];
+            double val = matrix[r][cols];
+            for (int c = p_col + 1; c < cols; c++) {
+                if (fabs(matrix[r][c]) > 1e-9) {
+                    val -= matrix[r][c] * sol[c];
+                }
+            }
+
+            if (val < -1e-9 || fabs(val - round(val)) > 1e-9) {
+                valid = false;
+                break;
+            }
+            int64_t v = (int64_t)round(val);
+            if (v < 0) {
+                valid = false;
+                break;
+            }
+            sol[p_col] = v;
+            sum += v;
+            if (sum >= *min_presses) {
+                valid = false;
+                break;
+            }
+        }
+
+        if (valid) {
+            if (sum < *min_presses) *min_presses = sum;
+        }
+        return;
+    }
+
+    int var_idx = free_vars[free_var_idx];
+    int64_t current_sum = 0;
+    // We only need the sum of free variables set so far
+    for (int i = 0; i < free_var_idx; i++) {
+        current_sum += current_sol[free_vars[i]];
+    }
+
+    int64_t upper_bound = max_target;
+    if (*min_presses != INT64_MAX) {
+        int64_t remaining = *min_presses - current_sum;
+        if (remaining < upper_bound) upper_bound = remaining;
+    }
+
+    for (int64_t v = 0; v <= upper_bound; v++) {
+        current_sol[var_idx] = v;
+        search_solutions(free_var_idx + 1, num_free, free_vars, current_sol, matrix, pivot, rows, cols, min_presses, max_target);
+        if (*min_presses == 0) return;
+    }
+    current_sol[var_idx] = 0;
+}
+
 static int64_t solve_ilp(MachinePart2* m) {
     int rows = m->num_counters;
     int cols = m->num_buttons;
 
     if (cols == 0) return 0;
 
-    // Build augmented matrix
     double matrix[100][101];
     for (int r = 0; r < rows; r++) {
         for (int c = 0; c < cols; c++) {
@@ -304,7 +378,6 @@ static int64_t solve_ilp(MachinePart2* m) {
         matrix[r][cols] = (double)m->targets[r];
     }
 
-    // Gaussian elimination
     int pivot[100];
     for (int i = 0; i < rows; i++) pivot[i] = -1;
 
@@ -323,7 +396,6 @@ static int64_t solve_ilp(MachinePart2* m) {
             continue;
         }
 
-        // Swap rows
         if (pivot_row != row) {
             for (int c = 0; c <= cols; c++) {
                 double tmp = matrix[row][c];
@@ -333,168 +405,46 @@ static int64_t solve_ilp(MachinePart2* m) {
         }
 
         pivot[row] = col;
-
-        // Scale
         double piv = matrix[row][col];
-        for (int c = 0; c <= cols; c++) {
-            matrix[row][c] /= piv;
-        }
+        for (int c = 0; c <= cols; c++) matrix[row][c] /= piv;
 
-        // Eliminate
         for (int r = 0; r < rows; r++) {
             if (r != row && fabs(matrix[r][col]) > 1e-9) {
                 double factor = matrix[r][col];
-                for (int c = 0; c <= cols; c++) {
-                    matrix[r][c] -= factor * matrix[row][c];
-                }
+                for (int c = 0; c <= cols; c++) matrix[r][c] -= factor * matrix[row][c];
             }
         }
-
         row++;
         col++;
     }
 
-    // Find free variables
     int free_vars[100];
     int num_free = 0;
     bool is_pivot[100] = {false};
     for (int r = 0; r < rows; r++) {
-        if (pivot[r] != -1) is_pivot[pivot[r]] = true;
+        if (pivot[r] != -1) {
+            if (pivot[r] < cols) is_pivot[pivot[r]] = true;
+        }
     }
     for (int c = 0; c < cols; c++) {
         if (!is_pivot[c]) free_vars[num_free++] = c;
     }
 
-    // Find max target for search bound
     int64_t max_target = 0;
     for (int i = 0; i < m->num_counters; i++) {
         if (m->targets[i] > max_target) max_target = m->targets[i];
     }
+    // AoC machines usually have target limits or bounded solutions
+    if (max_target > 1000) max_target = 1000; 
 
     int64_t min_presses = INT64_MAX;
+    int64_t current_sol[100] = {0};
 
-    // No free variables - unique solution
-    if (num_free == 0) {
-        int64_t sum = 0;
-        bool valid = true;
-        for (int r = 0; r < rows; r++) {
-            if (pivot[r] == -1) {
-                if (fabs(matrix[r][cols]) > 1e-9) {
-                    valid = false;
-                    break;
-                }
-                continue;
-            }
-            double val = matrix[r][cols];
-            if (val < -1e-9 || fabs(val - round(val)) > 1e-9) {
-                valid = false;
-                break;
-            }
-            int64_t v = (int64_t)round(val);
-            if (v < 0) {
-                valid = false;
-                break;
-            }
-            sum += v;
-        }
-        return valid ? sum : 0;
-    }
-
-    // Simple brute force for small free variable count
-    int bound = (int)(max_target + 1);
-    if (bound > 50) bound = 50;
-
-    if (num_free == 1) {
-        for (int v0 = 0; v0 <= bound; v0++) {
-            int64_t sol[100] = {0};
-            sol[free_vars[0]] = v0;
-            int64_t sum = v0;
-            bool valid = true;
-
-            for (int r = rows - 1; r >= 0; r--) {
-                if (pivot[r] == -1) continue;
-                double val = matrix[r][cols];
-                for (int c = pivot[r] + 1; c < cols; c++) {
-                    if (fabs(matrix[r][c]) > 1e-9) {
-                        val -= matrix[r][c] * sol[c];
-                    }
-                }
-                if (val < -1e-9 || fabs(val - round(val)) > 1e-9) {
-                    valid = false;
-                    break;
-                }
-                int64_t v = (int64_t)round(val);
-                if (v < 0) {
-                    valid = false;
-                    break;
-                }
-                sol[pivot[r]] = v;
-                sum += v;
-            }
-
-            if (valid && sum < min_presses) min_presses = sum;
-        }
-    } else if (num_free == 2) {
-        for (int v0 = 0; v0 <= bound; v0++) {
-            for (int v1 = 0; v1 <= bound; v1++) {
-                if (v0 + v1 >= min_presses) continue;
-                int64_t sol[100] = {0};
-                sol[free_vars[0]] = v0;
-                sol[free_vars[1]] = v1;
-                int64_t sum = v0 + v1;
-                bool valid = true;
-
-                for (int r = rows - 1; r >= 0; r--) {
-                    if (pivot[r] == -1) continue;
-                    double val = matrix[r][cols];
-                    for (int c = pivot[r] + 1; c < cols; c++) {
-                        if (fabs(matrix[r][c]) > 1e-9) {
-                            val -= matrix[r][c] * sol[c];
-                        }
-                    }
-                    if (val < -1e-9 || fabs(val - round(val)) > 1e-9) {
-                        valid = false;
-                        break;
-                    }
-                    int64_t v = (int64_t)round(val);
-                    if (v < 0) {
-                        valid = false;
-                        break;
-                    }
-                    sol[pivot[r]] = v;
-                    sum += v;
-                }
-
-                if (valid && sum < min_presses) min_presses = sum;
-            }
-        }
-    } else {
-        // Default: just use zero for free variables
-        int64_t sol[100] = {0};
-        int64_t sum = 0;
-        bool valid = true;
-
-        for (int r = rows - 1; r >= 0; r--) {
-            if (pivot[r] == -1) continue;
-            double val = matrix[r][cols];
-            if (val < -1e-9 || fabs(val - round(val)) > 1e-9) {
-                valid = false;
-                break;
-            }
-            int64_t v = (int64_t)round(val);
-            if (v < 0) {
-                valid = false;
-                break;
-            }
-            sol[pivot[r]] = v;
-            sum += v;
-        }
-
-        if (valid && sum < min_presses) min_presses = sum;
-    }
+    search_solutions(0, num_free, free_vars, current_sol, matrix, pivot, rows, cols, &min_presses, max_target);
 
     return (min_presses == INT64_MAX) ? 0 : min_presses;
 }
+
 
 int64_t day10_part2(const char* input) {
     char* data = strdup(input);
