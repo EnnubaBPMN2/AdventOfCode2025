@@ -20,7 +20,7 @@ void day12_run(void) {
 #define MAX_SHAPES 10
 #define MAX_CELLS 20
 #define MAX_ORIENTATIONS 8
-#define MAX_REGIONS 100
+#define MAX_REGIONS 1100
 
 typedef struct {
     int rows[MAX_CELLS];
@@ -222,11 +222,11 @@ int64_t day12_part1(const char* input) {
     Region regions[MAX_REGIONS];
     int num_regions = 0;
 
-    char* lines[500];
+    char* lines[1200];
     int line_count = 0;
 
     char* line = strtok(data, "\r\n");
-    while (line && line_count < 500) {
+    while (line && line_count < 1200) {
         lines[line_count++] = line;
         line = strtok(NULL, "\r\n");
     }

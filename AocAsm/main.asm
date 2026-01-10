@@ -94,6 +94,10 @@ main:
     je .run_day09_once
     cmp rax, 10
     je .run_day10_once
+    cmp rax, 11
+    je .run_day11_once
+    cmp rax, 12
+    je .run_day12_once
     jmp .exit
 
 .run_day01_once:
@@ -145,6 +149,16 @@ main:
     call day10_run
     jmp .exit
 
+.run_day11_once:
+    extern day11_run
+    call day11_run
+    jmp .exit
+
+.run_day12_once:
+    extern day12_run
+    call day12_run
+    jmp .exit
+
 .no_args:
     lea rcx, [msg_welcome]
     call print_string
@@ -192,7 +206,11 @@ main:
     je .run_day09
     cmp rax, 10
     je .run_day10
-    
+    cmp rax, 11
+    je .run_day11
+    cmp rax, 12
+    je .run_day12
+
     ; Day not implemented yet
     lea rcx, [msg_invalid]
     call print_string
@@ -305,6 +323,28 @@ main:
 
     extern day10_run
     call day10_run
+    jmp .menu_loop
+
+.run_day11:
+    lea rcx, [fmt_day_header]
+    call print_string
+    mov rcx, 11
+    call print_number
+    call print_newline
+
+    extern day11_run
+    call day11_run
+    jmp .menu_loop
+
+.run_day12:
+    lea rcx, [fmt_day_header]
+    call print_string
+    mov rcx, 12
+    call print_number
+    call print_newline
+
+    extern day12_run
+    call day12_run
     jmp .menu_loop
 
 .exit:

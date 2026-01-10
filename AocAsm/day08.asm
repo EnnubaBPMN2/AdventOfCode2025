@@ -23,6 +23,7 @@ section .bss
 section .text
     global day08_run
     extern read_file, print_string, print_number, print_newline, atoi64
+    extern GetTickCount64, print_elapsed
 
 day08_run:
     push rbp
@@ -34,7 +35,11 @@ day08_run:
     push r13
     push r14
     push r15
-    sub rsp, 32
+    sub rsp, 48
+
+    ; Start timing
+    call GetTickCount64
+    mov [rbp-40], rax       ; Save start time
 
     ; 1. Read file
     lea rcx, [real_file]
@@ -204,6 +209,10 @@ day08_run:
     jmp .p1_loop
 
 .p1_done:
+    ; End timing for Part 1
+    call GetTickCount64
+    mov [rbp-48], rax       ; Save end time
+
     call find_largest_3
     push rax
     call print_newline
@@ -213,6 +222,9 @@ day08_run:
     call print_string
     pop rcx
     call print_number
+    mov rcx, [rbp-40]       ; Start time
+    mov rdx, [rbp-48]       ; End time
+    call print_elapsed
     call print_newline
 
     ; 6. Part 2: Continue Kruskal until components == 1
@@ -249,16 +261,23 @@ day08_run:
 .p2_done:
     push 0                  ; Should not happen
 .p2_out:
+    ; End timing for Part 2
+    call GetTickCount64
+    mov [rbp-48], rax       ; Save end time
+
     lea rcx, [msg_part2_header]
     call print_string
     lea rcx, [msg_part2]
     call print_string
     pop rcx
     call print_number
+    mov rcx, [rbp-40]       ; Start time
+    mov rdx, [rbp-48]       ; End time
+    call print_elapsed
     call print_newline
 
 .done:
-    add rsp, 32
+    add rsp, 48
     pop r15
     pop r14
     pop r13

@@ -25,10 +25,12 @@ section .bss
     n_cnt   resq 1
     b_sum   resq 1
     f_cnt_m resq 1
+    f_mks   resq 128
 
 section .text
     global day10_run
     extern read_file, print_string, print_number, print_newline, atoi64
+    extern GetTickCount64, print_elapsed
 
 day10_run:
     push rbp
@@ -141,16 +143,20 @@ day10_run:
     call atoi64
     cvtsi2sd xmm0, rax
     movsd [t_p2 + r11*8], xmm0
+    inc r11
     add rsi, rdx
     lodsb
     cmp al, '}'
     je .rq_d
-    inc r11
     jmp .rq_l
 .rq_d:
     mov [n_cnt], r11
 
 .solv:
+    ; Start timer for Day 10
+    call GetTickCount64
+    mov [rbp-80], rax       ; Start time
+
     ; P1
     lea rdi, [pivs]
     mov rax, -1
@@ -230,6 +236,30 @@ day10_run:
     jmp .gf_fe
 .gf_be:
     mov r14, 1000
+    ; Precompute free variable masks for each row
+    xor r8, r8
+.gf_pm:
+    cmp r8, [n_lgt]
+    jae .p_pre_bf
+    mov rdx, [m_gf2+r8*8]
+    xor rax, rax
+    xor rdi, rdi
+.gf_pml:
+    cmp rdi, r11
+    jae .gf_pm_s
+    mov r10, [f_vs+rdi*8]
+    bt rdx, r10
+    jnc .gf_pmn
+    bts rax, rdi
+.gf_pmn:
+    inc rdi
+    jmp .gf_pml
+.gf_pm_s:
+    mov [f_mks+r8*8], rax
+    inc r8
+    jmp .gf_pm
+
+.p_pre_bf:
     xor rbx, rbx
 .gf_bf:
     xor rax, rax
@@ -237,27 +267,33 @@ day10_run:
 .gf_br:
     cmp r8, [n_lgt]
     jae .gf_bv
-    mov r9, [pivs+r8*8]
-    cmp r9, -1
-    je .gf_bs
+    mov r9, [f_mks+r8*8]
     mov rdx, [m_gf2+r8*8]
-    xor rcx, rcx
+    
+    ; Fast parity check using popcnt
+    mov rcx, r9
+    and rcx, rbx
+    popcnt rcx, rcx
+    
     bt rdx, 63
-    setc cl
-    xor rdi, rdi
-.gf_ff:
-    cmp rdi, r11
-    jae .gf_px
-    bt rbx, rdi
-    jnc .gf_fk
-    mov r10, [f_vs+rdi*8]
-    bt rdx, r10
-    jnc .gf_fk
-    xor rcx, 1
-.gf_fk:
-    inc rdi
-    jmp .gf_ff
-.gf_px:
+    setc dl
+    movzx rdx, dl
+    
+    xor rcx, rdx
+    and rcx, 1
+    
+    ; rcx = 1 if (popcnt(mask&rbx) XOR target) != 0
+    ; For pivot rows, additive rax part.
+    ; For zero rows, if rcx != 0, this whole configuration rbx is invalid!
+    cmp qword [pivs+r8*8], -1
+    jne .gf_bpiv
+    
+    ; Zero row: must be consistent
+    test rcx, rcx
+    jnz .gf_binv
+    jmp .gf_bs
+    
+.gf_bpiv:
     add rax, rcx
 .gf_bs:
     inc r8
@@ -265,20 +301,16 @@ day10_run:
 .gf_bv:
     push rax
     mov rax, rbx
-    xor rdx, rdx
-.gf_pk:
-    test rax, rax
-    jz .gf_pdn
-    inc rdx
-    lea rdi, [rax-1]
-    and rax, rdi
-    jmp .gf_pk
-.gf_pdn:
-    pop rax
+    popcnt rax, rax
+    pop rdx
     add rax, rdx
     cmp rax, r14
     jae .gf_nm
     mov r14, rax
+    jmp .gf_nm
+.gf_binv:
+    ; Consistency check failed for this rbx
+    jmp .gf_nm
 .gf_nm:
     inc rbx
     cmp r11, 15
@@ -290,7 +322,7 @@ day10_run:
     jb .gf_bf
 .gf_fc:
     add r12, r14
-
+    
     ; P2
     lea rdi, [pivs]
     mov rax, -1
@@ -435,12 +467,7 @@ day10_run:
     xor rcx, rcx
     xor rdx, rdx
     call p2_src
-    mov rax, [b_sum]
-    cmp rax, 0x10000000
-    jne .p2_o
-    xor rax, rax
-.p2_o:
-    add r13, rax
+    add r13, [b_sum]
 
 .sk_n:
     cmp rsi, r15
@@ -451,22 +478,30 @@ day10_run:
     jmp .loop
 
 .fin:
-    push r13
-    push r12
-    call print_newline
+    call GetTickCount64
+    mov r14, rax            ; End total time
+
     lea rcx, [m_p1_h]
     call print_string
     lea rcx, [m_p1_r]
     call print_string
-    pop rcx
+    mov rcx, r12
     call print_number
+    mov rcx, [rbp-80]       ; Start time
+    mov rdx, r14            ; End time (Part 1 finish is usually fine as total)
+    call print_elapsed
     call print_newline
+
     lea rcx, [m_p2_h]
     call print_string
     lea rcx, [m_p2_r]
     call print_string
-    pop rcx
+    mov rcx, r13
     call print_number
+    mov rcx, [rbp-80]
+    mov rdx, r14
+    call print_elapsed
+    call print_newline
     call print_newline
 
 .dn:
@@ -557,18 +592,20 @@ p2_src:
 .r:
     push rcx
     push rdx
+    push r10
+    push r11
     sub rsp, 32
     xor r10, r10
 .rl:
     cmp r10, 1000
     ja .rd
-    mov r11, [rsp + 40]      ; caller rdx (sum)
+    mov r11, [rsp + 48]      ; caller rdx (sum)
     add r11, r10
     cmp r11, [b_sum]
     jae .rd
-    mov rcx, [rsp + 48]      ; caller rcx (idx)
+    mov rcx, [rsp + 56]      ; caller rcx (idx)
     mov [tv+rcx*8], r10
-    mov [rsp+16], r10
+    mov [rsp+16], r10        ; Current local r10
     inc rcx
     mov rdx, r11
     call p2_src
@@ -577,6 +614,8 @@ p2_src:
     jmp .rl
 .rd:
     add rsp, 32
+    pop r11
+    pop r10
     pop rdx
     pop rcx
     ret

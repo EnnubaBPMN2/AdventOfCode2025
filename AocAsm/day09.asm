@@ -19,6 +19,7 @@ section .bss
 section .text
     global day09_run
     extern read_file, print_string, print_number, print_newline, atoi64
+    extern GetTickCount64, print_elapsed
 
 day09_run:
     push rbp
@@ -30,7 +31,11 @@ day09_run:
     push r13
     push r14
     push r15
-    sub rsp, 80             ; Local variables
+    sub rsp, 96             ; Local variables
+
+    ; Start timing
+    call GetTickCount64
+    mov [rbp-88], rax       ; Save start time
 
     ; 1. Read file
     lea rcx, [real_file]
@@ -109,6 +114,10 @@ day09_run:
     jmp .p1_i
 
 .p1_done:
+    ; End timing for Part 1
+    call GetTickCount64
+    mov [rbp-96], rax       ; Save end time
+
     push r14
     call print_newline
     lea rcx, [msg_part1_header]
@@ -117,6 +126,9 @@ day09_run:
     call print_string
     pop rcx
     call print_number
+    mov rcx, [rbp-88]       ; Start time
+    mov rdx, [rbp-96]       ; End time
+    call print_elapsed
     call print_newline
 
     ; 4. Part 2: Containment check
@@ -310,16 +322,23 @@ day09_run:
     jmp .p2_i
 
 .p2_done:
+    ; End timing for Part 2
+    call GetTickCount64
+    mov [rbp-96], rax       ; Save end time
+
     lea rcx, [msg_part2_header]
     call print_string
     lea rcx, [msg_part2]
     call print_string
     mov rcx, r14
     call print_number
+    mov rcx, [rbp-88]       ; Start time
+    mov rdx, [rbp-96]       ; End time
+    call print_elapsed
     call print_newline
 
 .done:
-    add rsp, 80
+    add rsp, 96
     pop r15
     pop r14
     pop r13

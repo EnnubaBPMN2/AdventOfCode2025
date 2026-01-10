@@ -8,7 +8,6 @@ section .data
     msg_part1 db 'Result: ', 0
     msg_part2_header db '=== Part 2 ===', 13, 10, 0
     msg_part2 db 'Result: ', 0
-    msg_debug_read db '[DEBUG] Read bytes: ', 0
 
 section .bss
     buffer resb 1048576     ; 1MB input buffer (day 2 input can be large)
@@ -17,6 +16,7 @@ section .bss
 section .text
     global day02_run
     extern read_file, print_string, print_number, print_newline, atoi64
+    extern GetTickCount64, print_elapsed
 
 day02_run:
     push rbp
@@ -28,7 +28,11 @@ day02_run:
     push r13
     push r14
     push r15
-    sub rsp, 48
+    sub rsp, 64
+
+    ; Start timing
+    call GetTickCount64
+    mov [rbp-56], rax       ; Save start time
 
     ; Read file
     lea rcx, [real_file]
@@ -42,13 +46,6 @@ day02_run:
     jz .done
 
     mov r14, rax            ; r14 = buffer length
-    
-    ; Debug: Print bytes read
-    lea rcx, [msg_debug_read]
-    call print_string
-    mov rcx, r14
-    call print_number
-    call print_newline
 
     lea rsi, [buffer]       ; rsi = current position in buffer
     lea r15, [buffer + r14] ; r15 = end of buffer
@@ -108,6 +105,10 @@ day02_run:
     jmp .parse_loop
 
 .print_results:
+    ; End timing
+    call GetTickCount64
+    mov [rbp-64], rax       ; Save end time
+
     call print_newline
     lea rcx, [msg_part1_header]
     call print_string
@@ -115,6 +116,9 @@ day02_run:
     call print_string
     mov rcx, r12
     call print_number
+    mov rcx, [rbp-56]       ; Start time
+    mov rdx, [rbp-64]       ; End time
+    call print_elapsed
     call print_newline
 
     call print_newline
@@ -124,10 +128,13 @@ day02_run:
     call print_string
     mov rcx, r13
     call print_number
+    mov rcx, [rbp-56]       ; Start time
+    mov rdx, [rbp-64]       ; End time
+    call print_elapsed
     call print_newline
 
 .done:
-    add rsp, 48
+    add rsp, 64
     pop r15
     pop r14
     pop r13

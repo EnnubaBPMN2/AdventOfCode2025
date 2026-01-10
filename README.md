@@ -1,6 +1,6 @@
 # 🎄 Advent of Code 2025 🎄
 
-Multi-language solution repository for [Advent of Code 2025](https://adventofcode.com/2025) challenges, featuring implementations in **C#**, **Python**, **Rust**, **Go**, **TypeScript**, **JavaScript**, and **C**.
+Multi-language solution repository for [Advent of Code 2025](https://adventofcode.com/2025) challenges, featuring implementations in **C#**, **Python**, **Rust**, **Go**, **TypeScript**, **JavaScript**, **C**, and **x64 Assembly**.
 
 ## 📁 Project Structure
 
@@ -56,9 +56,13 @@ AdventOfCode2025
 │   ├── package.json
 │   ├── main.js
 │   └── ...
-└── AocC/                        # ⚙️ C implementations (GCC)
-    ├── Makefile
-    ├── main.c
+├── AocC/                        # ⚙️ C implementations (GCC)
+│   ├── Makefile
+│   ├── main.c
+│   └── ...
+└── AocAsm/                      # 🔧 x64 Assembly implementations (NASM)
+    ├── build.bat
+    ├── main.asm
     └── ...
 
 ## � Documentation
@@ -99,15 +103,15 @@ All Advent of Code 2025 problem descriptions are stored in the `docs/problems/` 
 ### Architecture Overview
 
 The solution follows a three-tier architecture:
-
 ```
+
 📚 Documentation Layer (docs/)
     ↓
 📥 Data Layer (inputs/)
     ↓
 💻 Implementation Layer (AocCsharp, AocPython, AocRust)
-```
 
+```
 - **Documentation** (`docs/problems/`) contains the problem statements
 - **Data** (`inputs/`) contains the centralized puzzle inputs (shared across all languages)
 - **Implementations** solve the problems in their respective languages, all referencing the same inputs
@@ -123,6 +127,7 @@ The solution follows a three-tier architecture:
 - **TypeScript**: [Bun runtime](https://bun.sh/)
 - **JavaScript**: [Node.js 18+](https://nodejs.org/)
 - **C**: [GCC (MinGW-w64 on Windows)](https://winlibs.com/) with C17 support
+- **x64 Assembly**: [NASM](https://www.nasm.us/) with MSVC linker
 
 ### Running Solutions
 
@@ -191,6 +196,14 @@ cd AocC
 make
 ./aoc2025      # Linux/macOS
 aoc2025.exe    # Windows
+```
+
+#### x64 Assembly (NASM)
+
+```powershell
+cd AocAsm
+.\build.bat    # Windows only
+.\AocAsm.exe
 ```
 
 ## 📝 Workflow
@@ -388,6 +401,7 @@ The test framework will:
   - [x] TypeScript Implementation
   - [x] JavaScript Implementation
   - [x] C Implementation
+  - [x] x64 Assembly Implementation
 - [x] Day 02 - Gift Shop ⭐⭐
   - [x] C# Implementation
   - [x] Python Implementation
@@ -396,6 +410,7 @@ The test framework will:
   - [x] TypeScript Implementation
   - [x] JavaScript Implementation
   - [x] C Implementation
+  - [x] x64 Assembly Implementation
 - [x] Day 03 - Lobby ⭐⭐
   - [x] C# Implementation
   - [x] Python Implementation
@@ -404,6 +419,7 @@ The test framework will:
   - [x] TypeScript Implementation
   - [x] JavaScript Implementation
   - [x] C Implementation
+  - [x] x64 Assembly Implementation
 - [x] Day 04 - Printing Department ⭐⭐
   - [x] C# Implementation
   - [x] Python Implementation
@@ -412,6 +428,7 @@ The test framework will:
   - [x] TypeScript Implementation
   - [x] JavaScript Implementation
   - [x] C Implementation
+  - [x] x64 Assembly Implementation
 - [x] Day 05 - Cafeteria ⭐⭐
   - [x] C# Implementation
   - [x] Python Implementation
@@ -420,6 +437,7 @@ The test framework will:
   - [x] TypeScript Implementation
   - [x] JavaScript Implementation
   - [x] C Implementation
+  - [x] x64 Assembly Implementation
 - [x] Day 06 - Trash Compactor (Math Worksheet) ⭐⭐
   - [x] C# Implementation
   - [x] Python Implementation
@@ -428,6 +446,7 @@ The test framework will:
   - [x] TypeScript Implementation
   - [x] JavaScript Implementation
   - [x] C Implementation
+  - [x] x64 Assembly Implementation
 - [x] Day 07 - Laboratories (Tachyon Manifold) ⭐⭐
   - [x] C# Implementation
   - [x] Python Implementation
@@ -436,6 +455,7 @@ The test framework will:
   - [x] TypeScript Implementation
   - [x] JavaScript Implementation
   - [x] C Implementation
+  - [x] x64 Assembly Implementation
 - [x] Day 08 - Playground (Junction Box Circuits) ⭐⭐
   - [x] C# Implementation
   - [x] Python Implementation
@@ -444,6 +464,7 @@ The test framework will:
   - [x] TypeScript Implementation
   - [x] JavaScript Implementation
   - [x] C Implementation
+  - [x] x64 Assembly Implementation
 - [x] Day 09 - Movie Theater (Red Tiles) ⭐⭐
   - [x] C# Implementation
   - [x] Python Implementation
@@ -452,6 +473,7 @@ The test framework will:
   - [x] TypeScript Implementation
   - [x] JavaScript Implementation
   - [x] C Implementation
+  - [x] x64 Assembly Implementation
 - [x] Day 10 - Factory (Indicator Lights & Joltage Counters) ⭐⭐
   - [x] C# Implementation
   - [x] Python Implementation
@@ -460,6 +482,7 @@ The test framework will:
   - [x] TypeScript Implementation
   - [x] JavaScript Implementation
   - [x] C Implementation
+  - [x] x64 Assembly Implementation
 - [x] Day 11 - Reactor (Path Finding) ⭐⭐
   - [x] C# Implementation
   - [x] Python Implementation
@@ -468,6 +491,7 @@ The test framework will:
   - [x] TypeScript Implementation
   - [x] JavaScript Implementation
   - [x] C Implementation
+  - [x] x64 Assembly Implementation
 - [x] Day 12 - Christmas Tree Farm (2D Shape Packing) ⭐
   - [x] C# Implementation
   - [x] Python Implementation
@@ -476,6 +500,7 @@ The test framework will:
   - [x] TypeScript Implementation
   - [x] JavaScript Implementation
   - [x] C Implementation
+  - [x] x64 Assembly Implementation
 
 ## 💡 Tips
 
@@ -594,64 +619,66 @@ This repository demonstrates modern performance optimization patterns across C#,
 
 ## ⚡ Performance Comparison
 
-Execution times for real puzzle inputs across all seven language implementations (in seconds):
+Execution times for real puzzle inputs across all eight language implementations (in seconds):
 
-| Day    | Problem                                                  | C#     | TypeScript | JavaScript | Rust   | Go      | C      | PyPy   | Fastest         |
-| ------ | -------------------------------------------------------- | ------ | ---------- | ---------- | ------ | ------- | ------ | ------ | --------------- |
-| **1**  | Secret Entrance (Dial Rotations & Zeros)                 |        |            |            |        |         |        |        |                 |
-|        | Part 1                                                   | 0.003s | 0.001s     | 0.002s     | 0.001s | 0.0003s | 0.000s | 0.008s | 🥇 C / Go       |
-|        | Part 2                                                   | 0.010s | 0.001s     | 0.002s     | 0.004s | 0.0013s | 0.000s | 0.038s | 🥇 C            |
-| **2**  | Gift Shop (Range Parsing & Pattern Check)                |        |            |            |        |         |        |        |                 |
-|        | Part 1                                                   | 0.010s | 0.031s     | 0.012s     | 0.000s | 0.0021s | 0.064s | 0.011s | 🥇 Rust         |
-|        | Part 2                                                   | 0.009s | 0.026s     | 0.006s     | 0.001s | 0.0022s | 0.055s | 0.013s | 🥇 Rust         |
-| **3**  | Lobby (Monotonic Subsequences)                           |        |            |            |        |         |        |        |                 |
-|        | Part 1                                                   | 0.003s | 0.003s     | 0.001s     | 0.000s | 0.0001s | 0.002s | 0.001s | 🥇 Go           |
-|        | Part 2                                                   | 0.003s | 0.001s     | 0.002s     | 0.001s | 0.0001s | 0.001s | 0.001s | 🥇 Go           |
-| **4**  | Printing Department (Grid Neighbors & Cascading Removal) |        |            |            |        |         |        |        |                 |
-|        | Part 1                                                   | 0.001s | 0.003s     | 0.002s     | 0.000s | 0.0005s | 0.003s | 0.023s | 🥇 Rust         |
-|        | Part 2                                                   | 0.008s | 0.006s     | 0.004s     | 0.001s | 0.0009s | 0.043s | 0.016s | 🥇 Go           |
-| **5**  | Cafeteria (ID Verification & Matching Sets)              |        |            |            |        |         |        |        |                 |
-|        | Part 1                                                   | 0.001s | 0.001s     | 0.001s     | 0.000s | 0.0001s | 0.001s | 0.001s | 🥇 Go           |
-|        | Part 2                                                   | 0.000s | 0.000s     | 0.000s     | 0.000s | 0.0000s | 0.000s | 0.000s | 🥇 Go           |
-| **6**  | Trash Compactor (Math Worksheet Parsing)                 |        |            |            |        |         |        |        |                 |
-|        | Part 1                                                   | 0.000s | 0.002s     | 0.002s     | 0.000s | 0.0006s | 0.001s | 0.003s | 🥇 C# / Rust    |
-|        | Part 2                                                   | 0.000s | 0.002s     | 0.001s     | 0.000s | 0.0006s | 0.000s | 0.003s | 🥇 C# / Rust / C|
-| **7**  | Laboratories (Tachyon Manifold)                          |        |            |            |        |         |        |        |                 |
-|        | Part 1                                                   | 0.000s | 0.001s     | 0.000s     | 0.000s | 0.0000s | 0.000s | 0.008s | 🥇 Multiple     |
-|        | Part 2                                                   | 0.002s | 0.003s     | 0.001s     | 0.001s | 0.0005s | 0.000s | 0.008s | 🥇 C            |
-| **8**  | Playground (Junction Box Circuits)                       |        |            |            |        |         |        |        |                 |
-|        | Part 1                                                   | 0.156s | 0.808s     | 0.205s     | 0.034s | 0.079s  | 0.091s | 0.778s | 🥇 Rust         |
-|        | Part 2                                                   | 0.126s | 0.734s     | 0.172s     | 0.047s | 0.083s  | 0.056s | 0.717s | 🥇 Rust         |
-| **9**  | Movie Theater (Red Tiles)                                |        |            |            |        |         |        |        |                 |
-|        | Part 1                                                   | 0.002s | 0.002s     | 0.002s     | 0.000s | 0.0006s | 0.001s | 0.004s | 🥇 Rust         |
-|        | Part 2                                                   | 1.199s | 0.473s     | 0.392s     | 0.128s | 0.463s  | 0.324s | 0.431s | 🥇 Rust         |
-| **10** | Factory (Indicator Lights & Joltage Counters)            |        |            |            |        |         |        |        |                 |
-|        | Part 1                                                   | 0.003s | 0.006s     | 0.005s     | 0.001s | 0.003s  | 0.001s | 0.043s | 🥇 Rust / C     |
-|        | Part 2                                                   | 0.093s | 0.395s     | 0.162s     | 0.032s | 0.077s  | 0.002s | 0.276s | 🥇 C            |
-| **11** | Reactor (Path Finding)                                   |        |            |            |        |         |        |        |                 |
-|        | Part 1                                                   | 0.000s | 0.003s     | 0.001s     | 0.001s | 0.0001s | 0.003s | 0.008s | 🥇 Go           |
-|        | Part 2                                                   | 0.002s | 0.003s     | 0.001s     | 0.001s | 0.0005s | 0.001s | 0.018s | 🥇 Go           |
-| **12** | Christmas Tree Farm (2D Shape Packing) ⚡                 |        |            |            |        |         |        |        |                 |
-|        | Part 1                                                   | 0.408s | 0.758s     | 0.397s     | 0.134s | 0.164s  | 1.545s | 0.485s | 🥇 Rust         |
-|        | Part 2                                                   | (Auto) | (Auto)     | (Auto)     | (Auto) | (Auto)  | (Auto) | (Auto) | ✅               |
+| Day    | Problem                                                  | C#     | TypeScript | JavaScript | Rust   | Go      | C      | ASM    | PyPy   | Fastest          |
+| ------ | -------------------------------------------------------- | ------ | ---------- | ---------- | ------ | ------- | ------ | ------ | ------ | ---------------- |
+| **1**  | Secret Entrance (Dial Rotations & Zeros)                 |        |            |            |        |         |        |        |        |                  |
+|        | Part 1                                                   | 0.003s | 0.001s     | 0.002s     | 0.001s | 0.0003s | 0.000s | 0.000s | 0.008s | 🥇 C / ASM       |
+|        | Part 2                                                   | 0.010s | 0.001s     | 0.002s     | 0.004s | 0.0013s | 0.000s | 0.000s | 0.038s | 🥇 C / ASM       |
+| **2**  | Gift Shop (Range Parsing & Pattern Check)                |        |            |            |        |         |        |        |        |                  |
+|        | Part 1                                                   | 0.010s | 0.031s     | 0.012s     | 0.000s | 0.0021s | 0.057s | 0.078s | 0.011s | 🥇 Rust          |
+|        | Part 2                                                   | 0.009s | 0.026s     | 0.006s     | 0.001s | 0.0022s | 0.060s | 0.078s | 0.013s | 🥇 Rust          |
+| **3**  | Lobby (Monotonic Subsequences)                           |        |            |            |        |         |        |        |        |                  |
+|        | Part 1                                                   | 0.003s | 0.003s     | 0.001s     | 0.000s | 0.0001s | 0.001s | 0.015s | 0.001s | 🥇 Go            |
+|        | Part 2                                                   | 0.003s | 0.001s     | 0.002s     | 0.001s | 0.0001s | 0.001s | 0.015s | 0.001s | 🥇 Go            |
+| **4**  | Printing Department (Grid Neighbors & Cascading Removal) |        |            |            |        |         |        |        |        |                  |
+|        | Part 1                                                   | 0.001s | 0.003s     | 0.002s     | 0.000s | 0.0005s | 0.001s | 0.031s | 0.023s | 🥇 Rust          |
+|        | Part 2                                                   | 0.008s | 0.006s     | 0.004s     | 0.001s | 0.0009s | 0.031s | 0.031s | 0.016s | 🥇 Go            |
+| **5**  | Cafeteria (ID Verification & Matching Sets)              |        |            |            |        |         |        |        |        |                  |
+|        | Part 1                                                   | 0.001s | 0.001s     | 0.001s     | 0.000s | 0.0001s | 0.000s | 0.000s | 0.001s | 🥇 Multiple      |
+|        | Part 2                                                   | 0.000s | 0.000s     | 0.000s     | 0.000s | 0.0000s | 0.000s | 0.000s | 0.000s | 🥇 Multiple      |
+| **6**  | Trash Compactor (Math Worksheet Parsing)                 |        |            |            |        |         |        |        |        |                  |
+|        | Part 1                                                   | 0.000s | 0.002s     | 0.002s     | 0.000s | 0.0006s | 0.001s | 0.031s | 0.003s | 🥇 C# / Rust     |
+|        | Part 2                                                   | 0.000s | 0.002s     | 0.001s     | 0.000s | 0.0006s | 0.000s | 0.031s | 0.003s | 🥇 C# / Rust / C |
+| **7**  | Laboratories (Tachyon Manifold)                          |        |            |            |        |         |        |        |        |                  |
+|        | Part 1                                                   | 0.000s | 0.001s     | 0.000s     | 0.000s | 0.0000s | 0.000s | 0.031s | 0.008s | 🥇 Multiple      |
+|        | Part 2                                                   | 0.002s | 0.003s     | 0.001s     | 0.001s | 0.0005s | 0.000s | 0.031s | 0.008s | 🥇 C             |
+| **8**  | Playground (Junction Box Circuits)                       |        |            |            |        |         |        |        |        |                  |
+|        | Part 1                                                   | 0.156s | 0.808s     | 0.205s     | 0.034s | 0.079s  | 0.064s | 0.062s | 0.778s | 🥇 Rust          |
+|        | Part 2                                                   | 0.126s | 0.734s     | 0.172s     | 0.047s | 0.083s  | 0.055s | 0.062s | 0.717s | 🥇 Rust          |
+| **9**  | Movie Theater (Red Tiles)                                |        |            |            |        |         |        |        |        |                  |
+|        | Part 1                                                   | 0.002s | 0.002s     | 0.002s     | 0.000s | 0.0006s | 0.000s | 0.000s | 0.004s | 🥇 Multiple      |
+|        | Part 2                                                   | 1.199s | 0.473s     | 0.392s     | 0.128s | 0.463s  | 0.278s | 0.016s | 0.431s | 🥇 ASM           |
+| **10** | Factory (Indicator Lights & Joltage Counters)            |        |            |            |        |         |        |        |        |                  |
+|        | Part 1                                                   | 0.003s | 0.006s     | 0.005s     | 0.001s | 0.003s  | 0.001s | 0.000s | 0.043s | 🥇 ASM           |
+|        | Part 2                                                   | 0.093s | 0.395s     | 0.162s     | 0.032s | 0.077s  | 0.042s | 0.000s | 0.276s | 🥇 ASM           |
+| **11** | Reactor (Path Finding)                                   |        |            |            |        |         |        |        |        |                  |
+|        | Part 1                                                   | 0.000s | 0.003s     | 0.001s     | 0.001s | 0.0001s | 0.001s | 0.000s | 0.008s | 🥇 ASM           |
+|        | Part 2                                                   | 0.002s | 0.003s     | 0.001s     | 0.001s | 0.0005s | 0.001s | 0.000s | 0.018s | 🥇 ASM           |
+| **12** | Christmas Tree Farm (2D Shape Packing) ⚡                 |        |            |            |        |         |        |        |        |                  |
+|        | Part 1                                                   | 0.408s | 0.758s     | 0.397s     | 0.134s | 0.164s  | 0.106s | 0.047s | 0.485s | 🥇 ASM           |
+|        | Part 2                                                   | (Auto) | (Auto)     | (Auto)     | (Auto) | (Auto)  | (Auto) | (Auto) | (Auto) | ✅                |
 
 ### Summary Statistics
 
 | Language       | Total Time | Avg Time/Part | Wins     |
 | -------------- | ---------- | ------------- | -------- |
-| **Go**         | 0.015s     | 0.001s        | ⭐ 12/23  |
-| **Rust**       | 0.355s     | 0.015s        | 🥇 10/23 |
-| **C (GCC)**    | 2.211s     | 0.096s        | 🥈 5/23  |
-| **JavaScript** | 0.978s     | 0.043s        | 🥉 0/23  |
+| **ASM (x64)**  | 0.451s     | 0.019s        | ⭐ 9/23   |
+| **Go**         | 0.015s     | 0.001s        | 🥇 4/23  |
+| **Rust**       | 0.355s     | 0.015s        | 🥈 4/23  |
+| **C (GCC)**    | 0.697s     | 0.030s        | 🥉 2/23  |
+| **JavaScript** | 0.978s     | 0.043s        | 0/23     |
 | **C#**         | 1.743s     | 0.076s        | 0/23     |
 | **PyPy**       | 2.992s     | 0.130s        | 0/23     |
 | **TypeScript** | 3.054s     | 0.133s        | 0/23     |
 
 ### Key Observations
 
-- **Go dominates on sub-millisecond tasks**, holding the record for **12/23** parts with near-zero overhead.
-- **Rust leads on total execution time (0.355s)** and excels in compute-heavy recursive search and packing (Days 8, 9, 12).
-- **C (GCC) wins 5 parts** including Day 10 Part 2 (0.002s vs Rust's 0.032s) where manual parsing outperforms all other implementations.
+- **x64 Assembly dominates compute-heavy tasks**, winning **9/23** parts including Day 9 Part 2 (0.016s vs Rust's 0.128s - 8x faster) and Day 12 (0.047s vs Rust's 0.134s).
+- **Go excels on sub-millisecond tasks** with near-zero overhead, winning **4/23** parts.
+- **Rust remains competitive** on recursive algorithms, winning **4/23** parts including Days 8 (Junction Box Circuits).
+- **C (GCC) wins 2 parts** with optimized manual parsing beating higher-level languages.
 - **JavaScript (Node.js) outperforms TypeScript (Bun) significantly**: Node.js V8 engine achieves **0.978s total** vs Bun's **3.054s** (3.1x faster), demonstrating V8's superior optimization for compute-intensive workloads.
 - **JavaScript takes 4th place overall**, beating C# (1.743s), PyPy (2.992s), and TypeScript (3.054s) with optimized V8 JIT compilation.
 - **Node.js excels on intensive computations**:

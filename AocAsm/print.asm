@@ -14,7 +14,8 @@ section .text
     global print_string
     global print_number
     global print_newline
-    extern GetStdHandle, WriteConsoleA, lstrlenA
+    global print_elapsed
+    extern GetStdHandle, WriteConsoleA, lstrlenA, GetTickCount64
 
     ; Constant
     STD_OUTPUT_HANDLE equ -11
@@ -97,3 +98,94 @@ print_newline:
     call print_string
     add rsp, 32
     ret
+
+; -----------------------------------------------------------------------------
+; print_elapsed
+; Input: RCX = start time (ms), RDX = end time (ms)
+; Output: Prints [#.##0s]
+; -----------------------------------------------------------------------------
+print_elapsed:
+    push rbp
+    mov rbp, rsp
+    push rbx
+    push rdi
+    sub rsp, 48
+
+    mov rax, rdx
+    sub rax, rcx            ; RAX = elapsed ms
+    
+    ; Save elapsed ms
+    mov rbx, rax
+
+    ; Print "["
+    push rbx
+    sub rsp, 32
+    mov rcx, .msg_open
+    call print_string
+    add rsp, 32
+    pop rbx
+
+    ; Print Seconds (X.000)
+    mov rax, rbx
+    xor rdx, rdx
+    mov rcx, 1000
+    div rcx                 ; RAX = seconds, RDX = milliseconds
+    
+    push rdx
+    mov rcx, rax
+    call print_number
+    pop rdx
+
+    ; Print "."
+    push rdx
+    sub rsp, 32
+    mov rcx, .msg_dot
+    call print_string
+    add rsp, 32
+    pop rdx
+
+    ; Print Milliseconds (three digits, zero-padded)
+    ; RDX has 0-999
+    mov rax, rdx
+    mov rbx, 10
+    lea rdi, [num_buf + 10]
+    mov byte [rdi], 0       ; Null terminator
+
+    ; Always write exactly 3 digits
+    dec rdi
+    xor rdx, rdx
+    div rbx
+    add dl, '0'
+    mov [rdi], dl           ; digit 3 (ones)
+
+    dec rdi
+    xor rdx, rdx
+    div rbx
+    add dl, '0'
+    mov [rdi], dl           ; digit 2 (tens)
+
+    dec rdi
+    xor rdx, rdx
+    div rbx
+    add dl, '0'
+    mov [rdi], dl           ; digit 1 (hundreds)
+
+    mov rcx, rdi
+    call print_string
+
+    ; Print "s]"
+    sub rsp, 32
+    mov rcx, .msg_close
+    call print_string
+    add rsp, 32
+
+    add rsp, 48
+    pop rdi
+    pop rbx
+    pop rbp
+    ret
+
+section .data
+    .msg_open  db ' [', 0
+    .msg_dot   db '.', 0
+    .msg_close db 's]', 0

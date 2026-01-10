@@ -59,8 +59,14 @@ if %errorlevel% neq 0 exit /b %errorlevel%
 %NASM% -f win64 day10.asm -o day10.obj
 if %errorlevel% neq 0 exit /b %errorlevel%
 
+%NASM% -f win64 day11.asm -o day11.obj
+if %errorlevel% neq 0 exit /b %errorlevel%
+
+%NASM% -f win64 day12.asm -o day12.obj
+if %errorlevel% neq 0 exit /b %errorlevel%
+
 echo [INFO] Linking...
-%LINKER% main.obj io.obj print.obj parse.obj day01.obj day02.obj day03.obj day04.obj day05.obj day06.obj day07.obj day08.obj day09.obj day10.obj /subsystem:console /entry:main %KERNEL32% /LARGEADDRESSAWARE:NO /out:AocAsm.exe
+%LINKER% main.obj io.obj print.obj parse.obj day01.obj day02.obj day03.obj day04.obj day05.obj day06.obj day07.obj day08.obj day09.obj day10.obj day11.obj day12.obj /subsystem:console /entry:main %KERNEL32% /LARGEADDRESSAWARE:NO /out:AocAsm.exe
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 echo [SUCCESS] AocAsm.exe built successfully.

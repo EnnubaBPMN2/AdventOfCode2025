@@ -22,6 +22,7 @@ section .bss
 section .text
     global day06_run
     extern read_file, print_string, print_number, print_newline, atoi64
+    extern GetTickCount64, print_elapsed
 
 day06_run:
     push rbp
@@ -33,7 +34,11 @@ day06_run:
     push r13
     push r14
     push r15
-    sub rsp, 48
+    sub rsp, 64
+
+    ; Start timing
+    call GetTickCount64
+    mov [rbp-56], rax       ; Save start time
 
     ; Read file
     lea rcx, [real_file]
@@ -180,6 +185,10 @@ day06_run:
     jmp .p1_find_block
 
 .p1_done:
+    ; End timing for Part 1
+    call GetTickCount64
+    mov [rbp-64], rax       ; Save end time
+
     ; Print Part 1
     call print_newline
     lea rcx, [msg_part1_header]
@@ -188,6 +197,9 @@ day06_run:
     call print_string
     mov rcx, r13
     call print_number
+    mov rcx, [rbp-56]       ; Start time
+    mov rdx, [rbp-64]       ; End time
+    call print_elapsed
     call print_newline
 
     ; Part 2 Logic
@@ -272,6 +284,10 @@ day06_run:
     jmp .p2_find_block
 
 .p2_done:
+    ; End timing for Part 2
+    call GetTickCount64
+    mov [rbp-64], rax       ; Save end time
+
     call print_newline
     lea rcx, [msg_part2_header]
     call print_string
@@ -279,10 +295,13 @@ day06_run:
     call print_string
     mov rcx, r13
     call print_number
+    mov rcx, [rbp-56]       ; Start time
+    mov rdx, [rbp-64]       ; End time
+    call print_elapsed
     call print_newline
 
 .done:
-    add rsp, 48
+    add rsp, 64
     pop r15
     pop r14
     pop r13

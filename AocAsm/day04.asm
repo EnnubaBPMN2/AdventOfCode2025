@@ -28,6 +28,7 @@ section .bss
 section .text
     global day04_run
     extern read_file, print_string, print_number, print_newline
+    extern GetTickCount64, print_elapsed
 
 day04_run:
     push rbp
@@ -39,7 +40,11 @@ day04_run:
     push r13
     push r14
     push r15
-    sub rsp, 32
+    sub rsp, 48
+
+    ; Start timing
+    call GetTickCount64
+    mov [rbp-40], rax       ; Save start time
 
     ; Read file
     lea rcx, [real_file]
@@ -137,6 +142,10 @@ day04_run:
     jmp .p1_row
 
 .p1_done:
+    ; End timing for Part 1
+    call GetTickCount64
+    mov [rbp-48], rax       ; Save end time
+
     ; Print Part 1
     call print_newline
     lea rcx, [msg_part1_header]
@@ -145,6 +154,9 @@ day04_run:
     call print_string
     mov rcx, r13
     call print_number
+    mov rcx, [rbp-40]       ; Start time
+    mov rdx, [rbp-48]       ; End time
+    call print_elapsed
     call print_newline
 
     ; Part 2: iterative removal
@@ -292,16 +304,23 @@ day04_run:
     jmp .p2_neigh_loop
 
 .p2_done:
+    ; End timing for Part 2
+    call GetTickCount64
+    mov [rbp-48], rax       ; Save end time
+
     lea rcx, [msg_part2_header]
     call print_string
     lea rcx, [msg_part2]
     call print_string
     mov rcx, r13
     call print_number
+    mov rcx, [rbp-40]       ; Start time
+    mov rdx, [rbp-48]       ; End time
+    call print_elapsed
     call print_newline
 
 .done:
-    add rsp, 32
+    add rsp, 48
     pop r15
     pop r14
     pop r13
